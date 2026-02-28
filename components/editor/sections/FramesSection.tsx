@@ -59,7 +59,7 @@ export function FramesSection() {
           >
             <div
               className={cn(
-                'flex h-14 w-16 items-center justify-center rounded-lg border-2 bg-muted/50 transition-all p-1',
+                'flex h-20 w-24 items-center justify-center rounded-lg border-2 bg-muted/50 transition-all p-1.5',
                 isSelected(value)
                   ? 'border-border bg-card/50'
                   : 'border-border/40 hover:border-border hover:bg-card/30'
@@ -68,12 +68,12 @@ export function FramesSection() {
               <img
                 src={image}
                 alt={label}
-                className="h-auto max-h-12 w-auto object-contain"
+                className="h-auto max-h-16 w-auto object-contain"
                 loading="lazy"
               />
             </div>
             <span className={cn(
-              'text-[10px] whitespace-nowrap',
+              'text-xs whitespace-nowrap',
               isSelected(value) ? 'text-foreground' : 'text-muted-foreground'
             )}>
               {label}
