@@ -6,6 +6,7 @@ import type { AnnotationToolType } from '@/lib/store';
 import { SectionWrapper } from './SectionWrapper';
 import { cn } from '@/lib/utils';
 import { Delete02Icon } from 'hugeicons-react';
+import { Slider } from '@/components/ui/slider';
 
 // ── Tool definitions ──────────────────────────────────────────────────────────
 
@@ -14,10 +15,10 @@ const TOOLS: { id: AnnotationToolType; label: string; svg: React.ReactNode }[] =
     id: 'arrow',
     label: 'Arrow',
     svg: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M4 14L14 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M14 4L9 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M14 4L14 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M5 15L15 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M15 5L10 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M15 5L15 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -25,9 +26,9 @@ const TOOLS: { id: AnnotationToolType; label: string; svg: React.ReactNode }[] =
     id: 'curved-arrow',
     label: 'Curve',
     svg: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M4 13C4 13 5 5 10 5C13 5 14 7 14 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-        <path d="M11.5 5.5L14.5 7L12 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M5 14C5 14 6 6 11 6C14 6 15 8 15 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        <path d="M12.5 6.5L15.5 8L13 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </svg>
     ),
   },
@@ -35,8 +36,8 @@ const TOOLS: { id: AnnotationToolType; label: string; svg: React.ReactNode }[] =
     id: 'line',
     label: 'Line',
     svg: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M4 14L14 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M5 15L15 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -44,8 +45,8 @@ const TOOLS: { id: AnnotationToolType; label: string; svg: React.ReactNode }[] =
     id: 'rectangle',
     label: 'Rect',
     svg: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <rect x="3" y="4" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="3.5" y="5" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
       </svg>
     ),
   },
@@ -53,8 +54,8 @@ const TOOLS: { id: AnnotationToolType; label: string; svg: React.ReactNode }[] =
     id: 'circle',
     label: 'Circle',
     svg: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5" />
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.5" />
       </svg>
     ),
   },
@@ -62,9 +63,9 @@ const TOOLS: { id: AnnotationToolType; label: string; svg: React.ReactNode }[] =
     id: 'blur',
     label: 'Blur',
     svg: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <rect x="3" y="4" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2.5 2" />
-        <path d="M7 8h4M6 10h6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.4" />
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="3.5" y="5" width="13" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2.5 2" />
+        <path d="M7.5 9h5M7 11h6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.4" />
       </svg>
     ),
   },
@@ -78,11 +79,9 @@ const COLORS = [
   { value: '#3b82f6', name: 'Blue' },
   { value: '#8b5cf6', name: 'Purple' },
   { value: '#ec4899', name: 'Pink' },
-  { value: '#000000', name: 'Black' },
+  { value: '#171717', name: 'Black' },
   { value: '#ffffff', name: 'White' },
 ];
-
-const STROKE_PRESETS = [2, 4, 6, 8, 12];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -141,10 +140,10 @@ export function AnnotateSection() {
 
   return (
     <SectionWrapper title="Annotate" defaultOpen={true}>
-      <div className="space-y-4">
+      <div className="space-y-3">
 
-        {/* ── Tool grid ── */}
-        <div className="grid grid-cols-3 gap-1.5">
+        {/* ── Tool strip ── */}
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/40">
           {TOOLS.map((tool) => {
             const isActive = activeAnnotationTool === tool.id;
             return (
@@ -153,14 +152,14 @@ export function AnnotateSection() {
                 onClick={() => handleToolClick(tool.id)}
                 title={`${tool.label} — click, then draw on canvas`}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 py-2.5 px-2 rounded-lg text-[11px] font-medium transition-all duration-150',
+                  'flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg text-[10px] font-medium transition-all duration-150',
                   isActive
-                    ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
                 {tool.svg}
-                <span>{tool.label}</span>
+                <span className="leading-none">{tool.label}</span>
               </button>
             );
           })}
@@ -168,9 +167,12 @@ export function AnnotateSection() {
 
         {/* ── Active tool hint ── */}
         {activeAnnotationTool && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0" />
-            <span className="text-[11px] text-primary/80">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-primary/8 border border-primary/15">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-50" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            </span>
+            <span className="text-xs text-primary/90">
               {activeAnnotationTool === 'blur'
                 ? 'Draw a region on the canvas to blur'
                 : `Click and drag on canvas to draw ${activeAnnotationTool}`}
@@ -180,15 +182,15 @@ export function AnnotateSection() {
 
         {/* ── Selected annotation controls ── */}
         {selectedAnnotation && !activeAnnotationTool && (
-          <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/50 border border-border/30">
+          <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-accent/60 border border-border/40">
             <span className="text-xs text-muted-foreground">
               Selected: <span className="text-foreground font-medium capitalize">{selectedAnnotation.type}</span>
             </span>
             <button
               onClick={handleDeleteSelected}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors px-2 py-1 rounded-md hover:bg-destructive/10"
             >
-              <Delete02Icon size={13} />
+              <Delete02Icon size={14} />
               Delete
             </button>
           </div>
@@ -197,73 +199,42 @@ export function AnnotateSection() {
         {/* ── Color + stroke (only for non-blur tools) ── */}
         {activeAnnotationTool !== 'blur' && (
           <div className="space-y-3">
-            {/* Color label */}
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Color</span>
-            </div>
-
             {/* Color palette */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {COLORS.map(({ value, name }) => (
-                <button
-                  key={value}
-                  onClick={() => handleColorChange(value)}
-                  title={name}
-                  className={cn(
-                    'w-6 h-6 rounded-full transition-all duration-150 shrink-0',
-                    currentColor === value
-                      ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
-                      : 'hover:scale-110 hover:ring-1 hover:ring-border hover:ring-offset-1 hover:ring-offset-background'
-                  )}
-                  style={{
-                    backgroundColor: value,
-                    boxShadow: value === '#ffffff' ? 'inset 0 0 0 1px hsl(var(--border))' : undefined,
-                  }}
-                />
-              ))}
+            <div className="space-y-2">
+              <span className="text-xs font-medium text-muted-foreground">Color</span>
+              <div className="flex items-center gap-2">
+                {COLORS.map(({ value, name }) => (
+                  <button
+                    key={value}
+                    onClick={() => handleColorChange(value)}
+                    title={name}
+                    className={cn(
+                      'w-7 h-7 rounded-full transition-all duration-150 shrink-0',
+                      currentColor === value
+                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+                        : 'hover:scale-110'
+                    )}
+                    style={{
+                      backgroundColor: value,
+                      boxShadow: value === '#ffffff'
+                        ? 'inset 0 0 0 1.5px hsl(var(--border))'
+                        : '0 1px 2px rgba(0,0,0,0.15)',
+                    }}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Stroke width */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Stroke</span>
-                <span className="text-[11px] text-muted-foreground tabular-nums">{currentWidth}px</span>
-              </div>
-
-              {/* Stroke presets */}
-              <div className="flex items-center gap-1.5">
-                {STROKE_PRESETS.map((w) => (
-                  <button
-                    key={w}
-                    onClick={() => handleWidthChange(w)}
-                    className={cn(
-                      'flex-1 flex items-center justify-center h-8 rounded-md transition-all duration-150',
-                      currentWidth === w
-                        ? 'bg-primary/10 ring-1 ring-primary/30'
-                        : 'bg-muted/50 hover:bg-muted'
-                    )}
-                    title={`${w}px`}
-                  >
-                    <div
-                      className="rounded-full bg-foreground"
-                      style={{
-                        width: `${Math.max(4, w * 1.5)}px`,
-                        height: `${Math.max(4, w * 1.5)}px`,
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              {/* Fine control slider */}
-              <input
-                type="range"
-                min="1"
-                max="24"
-                step="1"
-                value={currentWidth}
-                onChange={(e) => handleWidthChange(Number(e.target.value))}
-                className="w-full h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-primary [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer"
+            <div className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">Stroke</span>
+              <Slider
+                value={[currentWidth]}
+                onValueChange={(v) => handleWidthChange(v[0])}
+                min={1}
+                max={24}
+                step={1}
+                valueDisplay={`${currentWidth}px`}
               />
             </div>
           </div>
@@ -273,7 +244,7 @@ export function AnnotateSection() {
         {blurRegions.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs font-medium text-muted-foreground">
                 Blur Regions
               </span>
               {blurRegions.length > 1 && (
@@ -289,29 +260,26 @@ export function AnnotateSection() {
               {blurRegions.map((region, index) => (
                 <div
                   key={region.id}
-                  className="flex items-center gap-2.5 py-2 px-3 rounded-lg bg-muted/30 border border-border/20 group hover:border-border/40 transition-colors"
+                  className="flex items-center gap-2.5 py-2 px-3 rounded-lg bg-muted/30 border border-border/30 group hover:border-border/50 transition-colors"
                 >
-                  <span className="text-[11px] font-medium text-muted-foreground tabular-nums w-3 shrink-0">
+                  <span className="text-xs font-medium text-muted-foreground tabular-nums w-4 shrink-0">
                     {index + 1}
                   </span>
-                  <input
-                    type="range"
-                    min="2"
-                    max="30"
-                    value={region.blurAmount}
-                    onChange={(e) =>
-                      updateBlurRegion(region.id, { blurAmount: Number(e.target.value) })
+                  <Slider
+                    value={[region.blurAmount]}
+                    onValueChange={(v) =>
+                      updateBlurRegion(region.id, { blurAmount: v[0] })
                     }
-                    className="flex-1 h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-primary [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer"
+                    min={2}
+                    max={30}
+                    step={1}
+                    valueDisplay={`${region.blurAmount}px`}
                   />
-                  <span className="text-[11px] text-muted-foreground tabular-nums w-6 text-right shrink-0">
-                    {region.blurAmount}px
-                  </span>
                   <button
                     onClick={() => removeBlurRegion(region.id)}
-                    className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-all shrink-0"
+                    className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all shrink-0 rounded hover:bg-destructive/10"
                   >
-                    <Delete02Icon size={12} />
+                    <Delete02Icon size={13} />
                   </button>
                 </div>
               ))}
@@ -321,15 +289,15 @@ export function AnnotateSection() {
 
         {/* ── Footer: count + clear ── */}
         {totalItems > 0 && (
-          <div className="flex items-center justify-between pt-1 border-t border-border/20">
-            <span className="text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between pt-2 border-t border-border/30">
+            <span className="text-xs text-muted-foreground">
               {annotations.length > 0 && `${annotations.length} shape${annotations.length !== 1 ? 's' : ''}`}
               {annotations.length > 0 && blurRegions.length > 0 && ' · '}
               {blurRegions.length > 0 && `${blurRegions.length} blur`}
             </span>
             <button
               onClick={() => { clearAnnotations(); clearBlurRegions(); }}
-              className="text-[11px] font-medium text-muted-foreground hover:text-destructive transition-colors"
+              className="text-xs font-medium text-muted-foreground hover:text-destructive transition-colors px-2 py-1 rounded-md hover:bg-destructive/10"
             >
               Clear all
             </button>

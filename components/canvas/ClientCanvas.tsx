@@ -139,9 +139,15 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
       if (!container) return;
 
       if (!container.contains(target)) {
+        // Don't deselect when interacting with editor panel controls
+        // (sliders, inputs, buttons, etc.) so users can tweak selected items
+        const el = target as HTMLElement;
+        if (el.closest?.('[data-slot="slider"], input, [data-radix-collection-item]')) return;
+
         setSelectedOverlayId(null);
         setIsMainImageSelected(false);
         setSelectedTextId(null);
+        setSelectedBlurId(null);
         setSelectedAnnotationId(null);
       }
     };
