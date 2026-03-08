@@ -43,7 +43,13 @@ function createTrack(
 }
 
 // ============================================
-// 3D PERSPECTIVE ANIMATION PRESETS
+// ANIMATION PRESETS
+// Follows Emil Kowalski's animation best practices:
+// - ease-out as default easing for entrances
+// - ease-in-out for on-screen movement
+// - Never animate from scale(0), minimum scale(0.95)
+// - Keep entrance animations snappy (800-1200ms)
+// - Use cubic/expo easing for snappier feel
 // ============================================
 
 export const ANIMATION_PRESETS: AnimationPreset[] = [
@@ -51,13 +57,17 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
   {
     id: 'hero-landing',
     name: 'Hero Landing',
-    description: 'Starts tilted back, lands flat with a dramatic entrance',
+    description: 'Starts tilted back, lands flat — classic SaaS hero entrance',
     category: 'reveal',
-    duration: 2500,
+    duration: 1200,
     tracks: [
       createTrack('Hero Landing', 'transform', [
-        createKeyframe(0, { rotateX: 30, scale: 0.8, perspective: 2400 }, 'linear'),
-        createKeyframe(2500, { rotateX: 0, scale: 1, perspective: 2400 }, 'ease-out'),
+        createKeyframe(0, { rotateX: 25, scale: 0.95, perspective: 2400 }, 'ease-out'),
+        createKeyframe(1200, { rotateX: 0, scale: 1, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Hero Landing Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(600, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
@@ -66,11 +76,15 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Slide In 3D',
     description: 'Enters from the right with a 3D rotation',
     category: 'reveal',
-    duration: 2000,
+    duration: 1000,
     tracks: [
       createTrack('Slide In 3D', 'transform', [
-        createKeyframe(0, { rotateY: 35, translateX: 40, perspective: 2400 }, 'linear'),
-        createKeyframe(2000, { rotateY: 0, translateX: 0, perspective: 2400 }, 'ease-out'),
+        createKeyframe(0, { rotateY: 30, translateX: 35, perspective: 2400 }, 'ease-out'),
+        createKeyframe(1000, { rotateY: 0, translateX: 0, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Slide In 3D Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(500, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
@@ -79,11 +93,15 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Rise & Settle',
     description: 'Rises from below and settles into place',
     category: 'reveal',
-    duration: 2500,
+    duration: 1000,
     tracks: [
       createTrack('Rise & Settle', 'transform', [
-        createKeyframe(0, { translateY: 30, rotateX: -20, perspective: 2400 }, 'linear'),
-        createKeyframe(2500, { translateY: 0, rotateX: 0, perspective: 2400 }, 'ease-out'),
+        createKeyframe(0, { translateY: 25, rotateX: -15, perspective: 2400, scale: 0.97 }, 'ease-out'),
+        createKeyframe(1000, { translateY: 0, rotateX: 0, perspective: 2400, scale: 1 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Rise & Settle Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(500, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
@@ -92,15 +110,151 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Drop In',
     description: 'Falls from above with a tilt and fades in',
     category: 'reveal',
-    duration: 2000,
+    duration: 1000,
     tracks: [
       createTrack('Drop In', 'transform', [
-        createKeyframe(0, { translateY: -25, rotateX: 15, perspective: 2400 }, 'linear'),
-        createKeyframe(2000, { translateY: 0, rotateX: 0, perspective: 2400 }, 'ease-out'),
+        createKeyframe(0, { translateY: -20, rotateX: 12, perspective: 2400, scale: 0.97 }, 'ease-out'),
+        createKeyframe(1000, { translateY: 0, rotateX: 0, perspective: 2400, scale: 1 }, 'ease-out-cubic'),
       ]),
       createTrack('Drop In Fade', 'opacity', [
-        createKeyframe(0, { imageOpacity: 0 }, 'linear'),
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(500, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+
+  // ============ SLIDE — Clean Slide Entrances ============
+  {
+    id: 'slide-up',
+    name: 'Slide Up',
+    description: 'Smooth upward entrance with fade',
+    category: 'slide',
+    duration: 800,
+    tracks: [
+      createTrack('Slide Up', 'transform', [
+        createKeyframe(0, { translateY: 30, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { translateY: 0, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Slide Up Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(400, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'slide-down',
+    name: 'Slide Down',
+    description: 'Smooth downward entrance with fade',
+    category: 'slide',
+    duration: 800,
+    tracks: [
+      createTrack('Slide Down', 'transform', [
+        createKeyframe(0, { translateY: -30, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { translateY: 0, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Slide Down Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(400, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'slide-left',
+    name: 'Slide Left',
+    description: 'Enters from the right, slides left',
+    category: 'slide',
+    duration: 800,
+    tracks: [
+      createTrack('Slide Left', 'transform', [
+        createKeyframe(0, { translateX: 35, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { translateX: 0, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Slide Left Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(400, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'slide-right',
+    name: 'Slide Right',
+    description: 'Enters from the left, slides right',
+    category: 'slide',
+    duration: 800,
+    tracks: [
+      createTrack('Slide Right', 'transform', [
+        createKeyframe(0, { translateX: -35, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { translateX: 0, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Slide Right Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(400, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+
+  // ============ FADE — Opacity-focused Entrances ============
+  {
+    id: 'fade-in',
+    name: 'Fade In',
+    description: 'Simple clean fade in',
+    category: 'fade',
+    duration: 800,
+    tracks: [
+      createTrack('Fade In', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
         createKeyframe(800, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'fade-scale',
+    name: 'Fade Scale',
+    description: 'Fades in with a subtle scale-up — popular app entrance',
+    category: 'fade',
+    duration: 800,
+    tracks: [
+      createTrack('Fade Scale', 'transform', [
+        createKeyframe(0, { scale: 0.96, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { scale: 1, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Fade Scale Opacity', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(600, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'fade-rise',
+    name: 'Fade Rise',
+    description: 'Fades in while rising slightly — minimal and elegant',
+    category: 'fade',
+    duration: 800,
+    tracks: [
+      createTrack('Fade Rise', 'transform', [
+        createKeyframe(0, { translateY: 12, scale: 0.98, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { translateY: 0, scale: 1, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Fade Rise Opacity', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(600, { imageOpacity: 1 }, 'ease-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'fade-zoom-out',
+    name: 'Fade Zoom Out',
+    description: 'Fades in while zooming out from close-up',
+    category: 'fade',
+    duration: 1000,
+    tracks: [
+      createTrack('Fade Zoom Out', 'transform', [
+        createKeyframe(0, { scale: 1.08, perspective: 2400 }, 'ease-out'),
+        createKeyframe(1000, { scale: 1, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Fade Zoom Out Opacity', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(600, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
@@ -111,12 +265,12 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Flip X',
     description: 'Full 180° flip on the X axis with scale dip',
     category: 'flip',
-    duration: 2000,
+    duration: 1500,
     tracks: [
       createTrack('Flip X', 'transform', [
-        createKeyframe(0, { rotateX: 0, scale: 1, perspective: 2400 }, 'linear'),
-        createKeyframe(1000, { rotateX: 90, scale: 0.85, perspective: 2400 }, 'ease-in'),
-        createKeyframe(2000, { rotateX: 180, scale: 1, perspective: 2400 }, 'ease-out'),
+        createKeyframe(0, { rotateX: 0, scale: 1, perspective: 2400 }, 'ease-out'),
+        createKeyframe(750, { rotateX: 90, scale: 0.95, perspective: 2400 }, 'ease-in'),
+        createKeyframe(1500, { rotateX: 180, scale: 1, perspective: 2400 }, 'ease-out'),
       ]),
     ],
   },
@@ -125,12 +279,12 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Flip Y',
     description: 'Full 180° flip on the Y axis with scale dip',
     category: 'flip',
-    duration: 2000,
+    duration: 1500,
     tracks: [
       createTrack('Flip Y', 'transform', [
-        createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'linear'),
-        createKeyframe(1000, { rotateY: 90, scale: 0.85, perspective: 2400 }, 'ease-in'),
-        createKeyframe(2000, { rotateY: 180, scale: 1, perspective: 2400 }, 'ease-out'),
+        createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-out'),
+        createKeyframe(750, { rotateY: 90, scale: 0.95, perspective: 2400 }, 'ease-in'),
+        createKeyframe(1500, { rotateY: 180, scale: 1, perspective: 2400 }, 'ease-out'),
       ]),
     ],
   },
@@ -139,13 +293,31 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Peek',
     description: 'Rotates to peek behind the card and returns',
     category: 'flip',
-    duration: 2500,
+    duration: 2000,
     tracks: [
       createTrack('Peek', 'transform', [
-        createKeyframe(0, { rotateY: 0, perspective: 2400 }, 'linear'),
-        createKeyframe(800, { rotateY: 45, perspective: 2400 }, 'ease-out'),
-        createKeyframe(1700, { rotateY: 45, perspective: 2400 }, 'linear'),
-        createKeyframe(2500, { rotateY: 0, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { rotateY: 0, perspective: 2400 }, 'ease-out'),
+        createKeyframe(600, { rotateY: 35, perspective: 2400 }, 'ease-out-cubic'),
+        createKeyframe(1400, { rotateY: 35, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2000, { rotateY: 0, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+    ],
+  },
+  {
+    id: 'flip-reveal',
+    name: 'Flip Reveal',
+    description: 'Starts flipped, rotates to reveal with a bounce',
+    category: 'flip',
+    duration: 1200,
+    tracks: [
+      createTrack('Flip Reveal', 'transform', [
+        createKeyframe(0, { rotateY: -90, scale: 0.95, perspective: 2400 }, 'ease-out'),
+        createKeyframe(800, { rotateY: 5, scale: 1.02, perspective: 2400 }, 'ease-out-cubic'),
+        createKeyframe(1200, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+      ]),
+      createTrack('Flip Reveal Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(400, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
@@ -156,11 +328,11 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Showcase Tilt',
     description: 'Slow pan to a product-showcase angle',
     category: 'perspective',
-    duration: 3000,
+    duration: 2500,
     tracks: [
       createTrack('Showcase Tilt', 'transform', [
-        createKeyframe(0, { rotateY: 0, rotateX: 0, perspective: 2400 }, 'linear'),
-        createKeyframe(3000, { rotateY: 20, rotateX: 8, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { rotateY: 0, rotateX: 0, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2500, { rotateY: 18, rotateX: 6, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
   },
@@ -169,26 +341,26 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Isometric',
     description: 'Shifts to an isometric viewing angle',
     category: 'perspective',
-    duration: 2500,
+    duration: 2000,
     tracks: [
       createTrack('Isometric', 'transform', [
-        createKeyframe(0, { rotateX: 0, rotateY: 0, scale: 1, perspective: 2400 }, 'linear'),
-        createKeyframe(2500, { rotateX: 25, rotateY: -25, scale: 0.9, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { rotateX: 0, rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2000, { rotateX: 22, rotateY: -22, scale: 0.95, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
   },
   {
     id: 'hover-float',
     name: 'Hover Float',
-    description: 'Subtle floating motion with gentle oscillation',
+    description: 'Subtle floating motion — great for looping ambient effects',
     category: 'perspective',
     duration: 3000,
     tracks: [
       createTrack('Hover Float', 'transform', [
-        createKeyframe(0, { rotateX: 0, translateY: 0, scale: 1, perspective: 2400 }, 'linear'),
-        createKeyframe(750, { rotateX: 5, translateY: -4, scale: 1.02, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { rotateX: 0, translateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(750, { rotateX: 4, translateY: -3, scale: 1.01, perspective: 2400 }, 'ease-in-out'),
         createKeyframe(1500, { rotateX: 0, translateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
-        createKeyframe(2250, { rotateX: -5, translateY: 4, scale: 1.02, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2250, { rotateX: -4, translateY: 3, scale: 1.01, perspective: 2400 }, 'ease-in-out'),
         createKeyframe(3000, { rotateX: 0, translateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
@@ -198,11 +370,28 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Parallax Drift',
     description: 'Slow drift with perspective tightening for depth',
     category: 'perspective',
-    duration: 3500,
+    duration: 3000,
     tracks: [
       createTrack('Parallax Drift', 'transform', [
-        createKeyframe(0, { translateX: -8, perspective: 2400, rotateY: -5 }, 'linear'),
-        createKeyframe(3500, { translateX: 8, perspective: 1200, rotateY: 5 }, 'ease-in-out'),
+        createKeyframe(0, { translateX: -6, perspective: 2400, rotateY: -4 }, 'ease-in-out'),
+        createKeyframe(3000, { translateX: 6, perspective: 1600, rotateY: 4 }, 'ease-in-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'apple-showcase',
+    name: 'Apple Showcase',
+    description: 'Clean Apple-style product reveal with tilt and scale',
+    category: 'perspective',
+    duration: 1500,
+    tracks: [
+      createTrack('Apple Showcase', 'transform', [
+        createKeyframe(0, { rotateX: 20, rotateY: -15, scale: 0.96, perspective: 2400 }, 'ease-out'),
+        createKeyframe(1500, { rotateX: 5, rotateY: -8, scale: 1, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Apple Showcase Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(600, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
@@ -213,12 +402,12 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Orbit Left',
     description: 'Smooth orbital arc to the left and back',
     category: 'orbit',
-    duration: 3000,
+    duration: 2500,
     tracks: [
       createTrack('Orbit Left', 'transform', [
-        createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'linear'),
-        createKeyframe(1500, { rotateY: -30, scale: 0.95, perspective: 2400 }, 'ease-in-out'),
-        createKeyframe(3000, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(1250, { rotateY: -25, scale: 0.97, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2500, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
   },
@@ -227,12 +416,12 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Orbit Right',
     description: 'Smooth orbital arc to the right and back',
     category: 'orbit',
-    duration: 3000,
+    duration: 2500,
     tracks: [
       createTrack('Orbit Right', 'transform', [
-        createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'linear'),
-        createKeyframe(1500, { rotateY: 30, scale: 0.95, perspective: 2400 }, 'ease-in-out'),
-        createKeyframe(3000, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(1250, { rotateY: 25, scale: 0.97, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2500, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
   },
@@ -244,8 +433,24 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     duration: 3000,
     tracks: [
       createTrack('Turntable', 'transform', [
-        createKeyframe(0, { rotateY: 0, scale: 0.9, perspective: 2400 }, 'linear'),
-        createKeyframe(3000, { rotateY: 360, scale: 0.9, perspective: 2400 }, 'linear'),
+        createKeyframe(0, { rotateY: 0, scale: 0.95, perspective: 2400 }, 'linear'),
+        createKeyframe(3000, { rotateY: 360, scale: 0.95, perspective: 2400 }, 'linear'),
+      ]),
+    ],
+  },
+  {
+    id: 'swing',
+    name: 'Swing',
+    description: 'Pendulum swing with slight rotation',
+    category: 'orbit',
+    duration: 2000,
+    tracks: [
+      createTrack('Swing', 'transform', [
+        createKeyframe(0, { rotateZ: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(500, { rotateZ: -8, rotateY: -10, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(1000, { rotateZ: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(1500, { rotateZ: 6, rotateY: 8, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(2000, { rotateZ: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
   },
@@ -256,11 +461,11 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Push Away',
     description: 'Pushes the image away with tightening perspective',
     category: 'depth',
-    duration: 2500,
+    duration: 2000,
     tracks: [
       createTrack('Push Away', 'transform', [
-        createKeyframe(0, { scale: 1, perspective: 2400, rotateX: 0 }, 'linear'),
-        createKeyframe(2500, { scale: 0.7, perspective: 1400, rotateX: 10 }, 'ease-in-out'),
+        createKeyframe(0, { scale: 1, perspective: 2400, rotateX: 0 }, 'ease-in-out'),
+        createKeyframe(2000, { scale: 0.85, perspective: 1600, rotateX: 8 }, 'ease-in-out'),
       ]),
     ],
   },
@@ -269,11 +474,11 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Pull Close',
     description: 'Pulls the image closer with loosening perspective',
     category: 'depth',
-    duration: 2500,
+    duration: 1200,
     tracks: [
       createTrack('Pull Close', 'transform', [
-        createKeyframe(0, { scale: 0.7, perspective: 1400, rotateX: -5 }, 'linear'),
-        createKeyframe(2500, { scale: 1.05, perspective: 2400, rotateX: 0 }, 'ease-out'),
+        createKeyframe(0, { scale: 0.95, perspective: 1800, rotateX: -4 }, 'ease-out'),
+        createKeyframe(1200, { scale: 1.03, perspective: 2400, rotateX: 0 }, 'ease-out-cubic'),
       ]),
     ],
   },
@@ -282,25 +487,83 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     name: 'Dramatic Zoom',
     description: 'Dramatic zoom with deep perspective shift',
     category: 'depth',
-    duration: 2000,
+    duration: 1200,
     tracks: [
       createTrack('Dramatic Zoom', 'transform', [
-        createKeyframe(0, { scale: 0.6, perspective: 1000 }, 'linear'),
-        createKeyframe(2000, { scale: 1.1, perspective: 2400 }, 'ease-out-cubic'),
+        createKeyframe(0, { scale: 0.95, perspective: 1400 }, 'ease-out'),
+        createKeyframe(1200, { scale: 1.08, perspective: 2400 }, 'ease-out-cubic'),
+      ]),
+      createTrack('Dramatic Zoom Fade', 'opacity', [
+        createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
+        createKeyframe(500, { imageOpacity: 1 }, 'ease-out'),
       ]),
     ],
   },
   {
     id: 'breathe-3d',
     name: 'Breathe 3D',
-    description: 'Gentle breathing motion with 3D rotation',
+    description: 'Gentle breathing motion with 3D rotation — great for loops',
     category: 'depth',
     duration: 3000,
     tracks: [
       createTrack('Breathe 3D', 'transform', [
-        createKeyframe(0, { scale: 1, rotateX: 0, rotateY: 0, perspective: 2400 }, 'linear'),
-        createKeyframe(1500, { scale: 1.05, rotateX: 3, rotateY: -3, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(0, { scale: 1, rotateX: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(1500, { scale: 1.03, rotateX: 2, rotateY: -2, perspective: 2400 }, 'ease-in-out'),
         createKeyframe(3000, { scale: 1, rotateX: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
+      ]),
+    ],
+  },
+
+  // ============ KEN BURNS — Cinematic Pan & Zoom ============
+  {
+    id: 'kenburns-zoom-in',
+    name: 'Zoom In',
+    description: 'Slow cinematic zoom in — classic Ken Burns effect',
+    category: 'kenburns',
+    duration: 4000,
+    tracks: [
+      createTrack('Ken Burns Zoom In', 'transform', [
+        createKeyframe(0, { scale: 1, translateX: 0, translateY: 0, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(4000, { scale: 1.15, translateX: 3, translateY: -2, perspective: 2400 }, 'ease-in-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'kenburns-zoom-out',
+    name: 'Zoom Out',
+    description: 'Slow zoom out to reveal the full image',
+    category: 'kenburns',
+    duration: 4000,
+    tracks: [
+      createTrack('Ken Burns Zoom Out', 'transform', [
+        createKeyframe(0, { scale: 1.12, translateX: -3, translateY: 2, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(4000, { scale: 1, translateX: 0, translateY: 0, perspective: 2400 }, 'ease-in-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'kenburns-pan-left',
+    name: 'Pan Left',
+    description: 'Slow cinematic pan to the left with subtle zoom',
+    category: 'kenburns',
+    duration: 4000,
+    tracks: [
+      createTrack('Ken Burns Pan Left', 'transform', [
+        createKeyframe(0, { translateX: 8, scale: 1.05, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(4000, { translateX: -8, scale: 1.08, perspective: 2400 }, 'ease-in-out'),
+      ]),
+    ],
+  },
+  {
+    id: 'kenburns-pan-right',
+    name: 'Pan Right',
+    description: 'Slow cinematic pan to the right with subtle zoom',
+    category: 'kenburns',
+    duration: 4000,
+    tracks: [
+      createTrack('Ken Burns Pan Right', 'transform', [
+        createKeyframe(0, { translateX: -8, scale: 1.05, perspective: 2400 }, 'ease-in-out'),
+        createKeyframe(4000, { translateX: 8, scale: 1.08, perspective: 2400 }, 'ease-in-out'),
       ]),
     ],
   },
@@ -347,8 +610,11 @@ export function getPresetById(id: string): AnimationPreset | undefined {
 // Category display names
 export const CATEGORY_LABELS: Record<AnimationPreset['category'], string> = {
   reveal: 'Reveal',
+  slide: 'Slide',
+  fade: 'Fade',
   flip: 'Flip',
   perspective: 'Perspective',
   orbit: 'Orbit',
   depth: 'Depth',
+  kenburns: 'Ken Burns',
 };

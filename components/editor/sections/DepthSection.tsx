@@ -546,6 +546,19 @@ function OverlayProperties({
         />
       </div>
 
+      {/* Blur */}
+      <div className="space-y-1.5">
+        <span className="text-xs font-medium text-muted-foreground">Blur</span>
+        <Slider
+          value={[overlay.blur ?? 0]}
+          onValueChange={(v) => onUpdate({ blur: v[0] })}
+          min={0}
+          max={20}
+          step={0.5}
+          valueDisplay={`${overlay.blur ?? 0}px`}
+        />
+      </div>
+
       {/* Flip */}
       <div className="flex gap-1.5">
         <button

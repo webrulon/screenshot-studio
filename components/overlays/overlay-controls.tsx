@@ -246,6 +246,19 @@ export function OverlayControls() {
               />
             </div>
 
+            {/* Blur */}
+            <div className="p-3 rounded-xl bg-muted border border-border">
+              <Slider
+                value={[selectedOverlay.blur ?? 0]}
+                onValueChange={(v) => updateImageOverlay(selectedOverlay.id, { blur: v[0] })}
+                max={20}
+                min={0}
+                step={0.5}
+                label="Blur"
+                valueDisplay={`${selectedOverlay.blur ?? 0}px`}
+              />
+            </div>
+
             {/* Flip Controls */}
             <div className="flex gap-2">
               <Button

@@ -91,6 +91,7 @@ function OverlayElement({
         height: `${overlay.size}px`,
         transform: `rotate(${overlay.rotation}deg)`,
         opacity: overlay.opacity,
+        filter: (overlay.blur ?? 0) > 0 ? `blur(${overlay.blur}px)` : undefined,
         cursor: 'grab',
         userSelect: 'none',
         pointerEvents: 'auto',

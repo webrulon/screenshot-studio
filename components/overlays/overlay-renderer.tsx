@@ -140,6 +140,7 @@ export function OverlayRenderer() {
               width: `${overlay.size}px`,
               height: `${overlay.size}px`,
               opacity: overlay.opacity,
+              filter: (overlay.blur ?? 0) > 0 ? `blur(${overlay.blur}px)` : undefined,
               transform: `
                 rotate(${overlay.rotation}deg)
                 scaleX(${overlay.flipX ? -1 : 1})

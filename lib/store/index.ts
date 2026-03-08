@@ -69,6 +69,7 @@ export interface ImageOverlay {
   size: number; // Size in pixels
   rotation: number; // Rotation in degrees
   opacity: number;
+  blur?: number; // Blur amount in pixels (0 = no blur)
   flipX: boolean;
   flipY: boolean;
   isVisible: boolean;
@@ -1052,7 +1053,7 @@ export const useImageStore = create<ImageState>()(
         .toString(36)
         .substr(2, 9)}`;
       set((state) => ({
-        imageOverlays: [...state.imageOverlays, { ...overlay, id }],
+        imageOverlays: [...state.imageOverlays, { blur: 0, ...overlay, id }],
       }));
     },
 

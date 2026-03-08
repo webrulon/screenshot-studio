@@ -25,14 +25,25 @@ interface PresetCategory {
 // Perspective in em units (150em = ~2400px at 16px base)
 const PRESET_CATEGORIES: PresetCategory[] = [
   {
-    name: 'Basic',
+    name: 'Popular',
     presets: [
       { name: 'Default', values: { perspective: 2400, rotateX: 0, rotateY: 0, rotateZ: 0, translateX: 0, translateY: 0, scale: 1 } },
+      { name: 'SaaS Hero', values: { perspective: 2400, rotateX: 8, rotateY: -6, rotateZ: 0, translateX: 0, translateY: -2, scale: 0.98 } },
+      { name: 'Product Shot', values: { perspective: 2000, rotateX: 5, rotateY: 12, rotateZ: 0, translateX: 3, translateY: -1, scale: 0.97 } },
+      { name: 'App Preview', values: { perspective: 2400, rotateX: 12, rotateY: -10, rotateZ: 0, translateX: -2, translateY: -3, scale: 0.96 } },
+      { name: 'Clean Angle', values: { perspective: 2400, rotateX: 6, rotateY: 8, rotateZ: -2, translateX: 2, translateY: -1, scale: 0.98 } },
+      { name: 'Landing Page', values: { perspective: 1800, rotateX: 15, rotateY: 0, rotateZ: 0, translateX: 0, translateY: -5, scale: 0.95 } },
+    ],
+  },
+  {
+    name: 'Basic',
+    presets: [
       { name: 'Tilt Left', values: { perspective: 2400, rotateX: 0, rotateY: 0, rotateZ: -8, translateX: 0, translateY: 0, scale: 0.95 } },
       { name: 'Tilt Right', values: { perspective: 2400, rotateX: 0, rotateY: 0, rotateZ: 8, translateX: 0, translateY: 0, scale: 0.95 } },
       { name: 'Subtle Left', values: { perspective: 2400, rotateX: 3, rotateY: -8, rotateZ: 0, translateX: -2, translateY: 0, scale: 1 } },
       { name: 'Subtle Right', values: { perspective: 2400, rotateX: 3, rotateY: 8, rotateZ: 0, translateX: 2, translateY: 0, scale: 1 } },
       { name: 'Lean Back', values: { perspective: 2400, rotateX: -15, rotateY: 0, rotateZ: 0, translateX: 0, translateY: 5, scale: 0.98 } },
+      { name: 'Lean Forward', values: { perspective: 2400, rotateX: 18, rotateY: 0, rotateZ: 0, translateX: 0, translateY: -4, scale: 0.97 } },
     ],
   },
   {
