@@ -52,8 +52,8 @@ A free, browser-based editor for creating stunning screenshots, animated visuals
 
 ```bash
 # Clone and install
-git clone https://github.com/KartikLabhshetwar/stage.git
-cd stage
+git clone https://github.com/KartikLabhshetwar/screenshot-studio.git
+cd screenshot-studio
 npm install
 
 # Start development server
@@ -137,13 +137,13 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## Contributors
 
-<a href="https://github.com/KartikLabhshetwar/stage/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=KartikLabhshetwar/stage" />
+<a href="https://github.com/KartikLabhshetwar/screenshot-studio/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=KartikLabhshetwar/screenshot-studio" />
 </a>
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=KartikLabhshetwar/stage&type=Date)](https://star-history.com/#KartikLabhshetwar/stage&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=KartikLabhshetwar/screenshot-studio&type=Date)](https://star-history.com/#KartikLabhshetwar/screenshot-studio&Date)
 
 ## License
 
@@ -151,5 +151,5 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## Support
 
-- [GitHub Issues](https://github.com/KartikLabhshetwar/stage/issues)
-- [GitHub Discussions](https://github.com/KartikLabhshetwar/stage/discussions)
+- [GitHub Issues](https://github.com/KartikLabhshetwar/screenshot-studio/issues)
+- [GitHub Discussions](https://github.com/KartikLabhshetwar/screenshot-studio/discussions)

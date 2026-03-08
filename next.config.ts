@@ -18,6 +18,17 @@ const nextConfig: NextConfig = {
   // Only applied to editor routes — applying globally breaks YouTube embeds on landing page
   async headers() {
     return [
+      // Security and SEO headers for all pages
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-DNS-Prefetch-Control", value: "on" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+      // COOP/COEP for editor routes (FFmpeg WASM)
       {
         source: "/editor/:path*",
         headers: [

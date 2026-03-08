@@ -110,7 +110,7 @@ console.log(greet('World'))`;
 type Status = 'idle' | 'capturing';
 
 export function CodeSnippetSection() {
-  const { setUploadedImageUrl, setImageOpacity, setImageScale } = useImageStore();
+  const { setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius: setCanvasBorderRadius } = useImageStore();
 
   const [code, setCode] = React.useState(DEFAULT_CODE);
   const [language, setLanguage] = React.useState('javascript');
@@ -146,8 +146,8 @@ export function CodeSnippetSection() {
     try {
       const canvas = await domToCanvas(captureRef.current, {
         scale: 3,
-        backgroundColor: null,
-        style: { transform: 'none' },
+        backgroundColor: themeBg,
+        style: { transform: 'none', borderRadius: '0px' },
       });
 
       const blob = await new Promise<Blob | null>((resolve) =>
@@ -160,6 +160,8 @@ export function CodeSnippetSection() {
         // Reset opacity and scale so snippet renders at full visibility
         setImageOpacity(1);
         setImageScale(100);
+        // Set border radius to 24 for a polished rounded look on the canvas
+        setCanvasBorderRadius(24);
         setStatus('idle');
       } else {
         setStatus('idle');
@@ -168,7 +170,7 @@ export function CodeSnippetSection() {
       console.error('Code capture failed:', e);
       setStatus('idle');
     }
-  }, [setUploadedImageUrl, setImageOpacity, setImageScale, status]);
+  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setCanvasBorderRadius, status]);
 
   const selectClass =
     'h-7 px-2 rounded-md border border-border bg-muted text-[11px] text-foreground outline-none';
@@ -316,6 +318,7 @@ export function CodeSnippetSection() {
             style={{
               borderRadius: `${borderRadius}px`,
               overflow: 'hidden',
+              backgroundColor: themeBg,
             }}
           >
             {/* Optional macOS title bar */}

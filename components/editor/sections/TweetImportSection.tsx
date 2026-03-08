@@ -151,8 +151,6 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
         backgroundColor: colors.bg,
         color: colors.text,
         padding: '16px',
-        borderRadius: '16px',
-        border: `1px solid ${colors.border}`,
         fontFamily:
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
         width: '100%',
@@ -215,9 +213,7 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
         <div
           style={{
             marginTop: '10px',
-            borderRadius: '12px',
             overflow: 'hidden',
-            border: `1px solid ${colors.border}`,
             display: 'grid',
             gridTemplateColumns: photos.length > 1 ? '1fr 1fr' : '1fr',
             gap: '2px',
@@ -277,7 +273,7 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
 type Status = 'idle' | 'loading' | 'loaded' | 'capturing';
 
 export function TweetImportSection() {
-  const { setUploadedImageUrl, setImageOpacity, setImageScale } = useImageStore();
+  const { setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius } = useImageStore();
 
   const [urlInput, setUrlInput] = React.useState('');
   const [tweetData, setTweetData] = React.useState<TweetData | null>(null);
@@ -349,10 +345,11 @@ export function TweetImportSection() {
         )
       );
 
+      const captureBg = tweetTheme === 'dark' ? '#000000' : '#ffffff';
       const canvas = await domToCanvas(captureRef.current, {
         scale: 3,
-        backgroundColor: null,
-        style: { transform: 'none' },
+        backgroundColor: captureBg,
+        style: { transform: 'none', borderRadius: '0px' },
       });
 
       const blob = await new Promise<Blob | null>((resolve) =>
@@ -365,6 +362,8 @@ export function TweetImportSection() {
         // Reset opacity and scale so the tweet renders at full visibility
         setImageOpacity(1);
         setImageScale(100);
+        // Set border radius to 24 for a polished rounded look on the canvas
+        setBorderRadius(24);
         // Reset form immediately
         setTweetData(null);
         setUrlInput('');
@@ -375,7 +374,7 @@ export function TweetImportSection() {
       setError('Failed to capture tweet');
       setStatus('loaded');
     }
-  }, [setUploadedImageUrl, setImageOpacity, setImageScale]);
+  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius, tweetTheme]);
 
   return (
     <SectionWrapper title="Import Tweet" defaultOpen={false}>
@@ -457,7 +456,8 @@ export function TweetImportSection() {
             {/* Capture area */}
             <div
               ref={captureRef}
-              className="rounded-xl overflow-hidden"
+              className="overflow-hidden rounded-xl"
+              style={{ backgroundColor: tweetTheme === 'dark' ? '#000000' : '#ffffff' }}
             >
               <TweetCard tweet={tweetData} theme={tweetTheme} />
             </div>

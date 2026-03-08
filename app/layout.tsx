@@ -32,6 +32,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/lib/query-client";
 import { GlobalDropZone } from "@/components/GlobalDropZone";
+import { getRootJsonLd } from "@/lib/seo/json-ld";
 
 // System UI fonts
 const geistSans = Geist({
@@ -347,8 +348,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const rootJsonLd = getRootJsonLd();
+
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
+        />
+      </head>
       <body
         className={`${fontVariables} antialiased`}
       >

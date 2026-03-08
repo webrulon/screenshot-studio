@@ -1,85 +1,96 @@
 import { MetadataRoute } from 'next'
+import { getAllComparisonSlugs } from '@/lib/seo/comparisons'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.BETTER_AUTH_URL || 'https://screenshot-studio.com'
+  const now = new Date('2026-03-08')
+
+  const comparisonSlugs = getAllComparisonSlugs()
 
   return [
     // Editor (main product, now at root)
     {
       url: baseUrl,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 1.0,
     },
     // Landing page
     {
       url: `${baseUrl}/landing`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     // Keyword landing page (high SEO priority)
     {
       url: `${baseUrl}/free-screenshot-editor`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     // Features hub page
     {
       url: `${baseUrl}/features`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     // Individual feature pages (SEO landing pages)
     {
       url: `${baseUrl}/features/screenshot-beautifier`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/features/social-media-graphics`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/features/animation-maker`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/features/3d-effects`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    // Comparison pages (programmatic SEO - "vs" keywords)
+    ...comparisonSlugs.map((slug) => ({
+      url: `${baseUrl}/compare/${slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
     // Persona/use-case pages (programmatic SEO)
     {
       url: `${baseUrl}/for/developers`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/for/marketers`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/for/designers`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     // Changelog
     {
       url: `${baseUrl}/changelog`,
-      lastModified: new Date('2026-03-06'),
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.6,
     },
