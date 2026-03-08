@@ -160,6 +160,17 @@ export function Footer({ brandName = "Screenshot Studio" }: FooterProps) {
           <p className="text-xs text-muted-foreground">
             © {currentYear} {brandName}
           </p>
+          <a
+            href="https://peerlist.io/code_kartik/project/screenshot-studio"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img
+              src="https://dqy38fnwh4fqs.cloudfront.net/website/project-spotlight/project-week-rank-one-dark.svg"
+              alt="Peerlist Project Spotlight - Rank 1"
+              className="h-10"
+            />
+          </a>
         </div>
       </div>
     </footer>
