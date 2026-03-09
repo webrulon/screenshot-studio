@@ -1,36 +1,6 @@
 "use client";
 
-import { Component, type ReactNode } from "react";
-import { Player } from "@remotion/player";
-import {
-  FeatureDragDropDemo,
-  Feature3DFramesDemo,
-  FeatureAnimateExportDemo,
-} from "@/remotion";
-
-// Silent error boundary for Remotion players
-class PlayerErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean }
-> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="w-full aspect-[3/2] rounded-xl bg-card border border-border/50 flex items-center justify-center text-muted-foreground text-sm">
-          Preview unavailable
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
+import { motion } from "motion/react";
 
 interface ValuePropositionProps {
   eyebrow?: string;
@@ -39,133 +9,138 @@ interface ValuePropositionProps {
 
 const features = [
   {
-    title: "Lightning Fast Editing",
+    title: "Beautiful Backgrounds",
     description:
-      "Create stunning images in seconds, not hours. Our intuitive editor eliminates the learning curve.",
-    bullets: [
-      "Drag and drop any screenshot",
-      "100+ gradient and texture backgrounds",
-      "Customizable shadows, borders, and padding",
-    ],
-    Demo: FeatureDragDropDemo,
-    durationInFrames: 360,
-    width: 800,
-    height: 500,
+      "100+ gradients, solid colors, images, blur, and noise effects. Make any screenshot look stunning.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2" y="2" width="16" height="16" rx="3" />
+        <path d="M2 13l5-5 3 3 4-4 4 4" />
+        <circle cx="14" cy="6" r="1.5" />
+      </svg>
+    ),
   },
   {
-    title: "3D Transforms & Frames",
+    title: "Device Frames",
     description:
-      "Add depth and dimension with 30+ perspective presets. Browser frames, Polaroid borders, and dramatic angles.",
-    bullets: [
-      "macOS, Windows, and Arc browser frames",
-      "30+ 3D perspective presets",
-      "Polaroid and custom border styles",
-    ],
-    Demo: Feature3DFramesDemo,
-    durationInFrames: 360,
-    width: 800,
-    height: 500,
+      "macOS, Windows, Arc browser frames and Polaroid borders with customizable width and opacity.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2" y="3" width="16" height="13" rx="2" />
+        <path d="M2 7h16" />
+        <circle cx="4.5" cy="5" r="0.75" fill="currentColor" />
+        <circle cx="7" cy="5" r="0.75" fill="currentColor" />
+        <circle cx="9.5" cy="5" r="0.75" fill="currentColor" />
+      </svg>
+    ),
   },
   {
-    title: "Animate & Export",
+    title: "3D Transforms",
     description:
-      "Create cinematic slideshows with 20+ animation presets. Export as high-res images or animated videos.",
-    bullets: [
-      "20+ animation presets (zoom, pan, Ken Burns)",
-      "Export up to 5x resolution",
-      "PNG with transparency or JPG",
-    ],
-    Demo: FeatureAnimateExportDemo,
-    durationInFrames: 360,
-    width: 800,
-    height: 500,
+      "30+ perspective presets. Add depth and dimension with realistic rotation and tilt.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M3 14l7 4 7-4" />
+        <path d="M3 10l7 4 7-4" />
+        <path d="M3 6l7 4 7-4L10 2 3 6z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Draw & Markup",
+    description:
+      "Arrows, shapes, blur regions, and text overlays. Annotate and highlight what matters.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M13.586 3.586a2 2 0 112.828 2.828l-8.793 8.793-3.535.707.707-3.536 8.793-8.792z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Animations & Video",
+    description:
+      "20+ animation presets with timeline editor. Export as MP4, WebM, or GIF.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <polygon points="6,3 18,10 6,17" />
+      </svg>
+    ),
+  },
+  {
+    title: "Tweet & Code Snippets",
+    description:
+      "Import tweets by URL. Generate beautiful code snippet images with 20+ themes.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M7 7l-4 3 4 3" />
+        <path d="M13 7l4 3-4 3" />
+        <path d="M11 4l-2 12" />
+      </svg>
+    ),
+  },
+  {
+    title: "High-Res Export",
+    description:
+      "PNG or JPG up to 5x resolution. Fully in-browser, no server processing.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M10 3v10m0 0l-3-3m3 3l3-3" />
+        <path d="M3 15v2h14v-2" />
+      </svg>
+    ),
+  },
+  {
+    title: "Custom Presets",
+    description:
+      "Save and reuse your own canvas configurations. One-click to apply any saved style.",
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="3" width="6" height="6" rx="1" />
+        <rect x="11" y="3" width="6" height="6" rx="1" />
+        <rect x="3" y="11" width="6" height="6" rx="1" />
+        <rect x="11" y="11" width="6" height="6" rx="1" />
+      </svg>
+    ),
   },
 ];
 
 export function ValueProposition({
-  eyebrow = "Why Screenshot Studio?",
+  eyebrow = "Features",
 }: ValuePropositionProps) {
   return (
-    <section className="py-16 sm:py-24 px-6 bg-background">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-20 sm:py-28 px-6 bg-background">
+      <div className="max-w-5xl mx-auto">
         {/* Section header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-14">
           <p className="text-sm text-muted-foreground uppercase tracking-widest mb-4">
             {eyebrow}
           </p>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-            Everything you need to make images look great
+            Everything you need.
+            <br />
+            <span className="text-muted-foreground">Nothing you don&apos;t.</span>
           </h2>
         </div>
 
-        {/* Alternating feature sections */}
-        <div className="space-y-20">
+        {/* Feature grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 rounded-xl overflow-hidden border border-border/40">
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={index}
-              className={`grid md:grid-cols-2 gap-12 items-center ${
-                index % 2 === 1 ? "md:[direction:rtl]" : ""
-              }`}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ delay: index * 0.04, duration: 0.4 }}
+              className="bg-card p-6 hover:bg-accent/50 transition-colors"
             >
-              {/* Text side */}
-              <div className={index % 2 === 1 ? "md:[direction:ltr]" : ""}>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  {feature.description}
-                </p>
-                <ul className="space-y-3">
-                  {feature.bullets.map((bullet, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-3 text-sm text-muted-foreground"
-                    >
-                      <svg
-                        className="w-4 h-4 text-primary mt-0.5 shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Demo side */}
-              <div
-                className={`relative ${
-                  index % 2 === 1 ? "md:[direction:ltr]" : ""
-                }`}
-              >
-                <div className="rounded-xl overflow-hidden border border-border/50">
-                  <PlayerErrorBoundary>
-                    <Player
-                      component={feature.Demo}
-                      durationInFrames={feature.durationInFrames}
-                      fps={60}
-                      compositionWidth={feature.width}
-                      compositionHeight={feature.height}
-                      autoPlay
-                      loop
-                      controls={false}
-                      acknowledgeRemotionLicense
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        aspectRatio: `${feature.width}/${feature.height}`,
-                      }}
-                    />
-                  </PlayerErrorBoundary>
-                </div>
-              </div>
-            </div>
+              <div className="text-primary mb-3">{feature.icon}</div>
+              <h3 className="text-sm font-semibold text-foreground mb-1.5">
+                {feature.title}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {feature.description}
+              </p>
+            </motion.div>
           ))}
         </div>
       </div>

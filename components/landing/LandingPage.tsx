@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Navigation } from "./Navigation";
 import { Hero } from "./Hero";
 import { HowItWorks } from "./HowItWorks";
@@ -10,6 +9,7 @@ import { StructuredData } from "./StructuredData";
 import { ValueProposition } from "./ValueProposition";
 import { BackedBy } from "./BackedBy";
 import { MasonryGrid } from "./MasonryGrid";
+import { EditorPreview } from "./EditorPreview";
 
 interface HowItWorksStep {
   step: number;
@@ -70,18 +70,9 @@ export function LandingPage({
         ctaHref={ctaHref}
       />
 
-      {/* Hero Screenshot */}
+      {/* Editor Preview */}
       <section className="pb-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <Image
-            src="/og.png"
-            alt="Screenshot Studio editor preview"
-            width={1200}
-            height={630}
-            className="w-full h-auto rounded-xl border border-border/50"
-            priority
-          />
-        </div>
+        <EditorPreview />
       </section>
 
       <BackedBy />
