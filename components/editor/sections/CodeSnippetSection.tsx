@@ -24,10 +24,17 @@ import {
   stackoverflowLight,
 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { useImageStore } from '@/lib/store';
+import { getAspectRatioPreset } from '@/lib/aspect-ratio-utils';
 import { SectionWrapper } from './SectionWrapper';
 import { cn } from '@/lib/utils';
 import { domToCanvas } from 'modern-screenshot';
 import { Loading03Icon } from 'hugeicons-react';
+
+// Max width of the off-screen render (px). Code wraps at this width.
+const MAX_RENDER_WIDTH = 1200;
+
+// Width at which the preview card renders before being scaled to fit the panel.
+const PREVIEW_WIDTH = 500;
 
 // ── Theme definitions ────────────────────────────────────────────────────────
 
@@ -106,43 +113,6 @@ const DEFAULT_CODE = `function greet(name) {
 
 console.log(greet('World'))`;
 
-// ── Toggle Switch ─────────────────────────────────────────────────────────────
-
-function Toggle({
-  checked,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className="flex items-center gap-1.5 group"
-    >
-      <div
-        className={cn(
-          'relative w-7 h-4 rounded-full transition-colors duration-200',
-          checked ? 'bg-primary' : 'bg-border'
-        )}
-      >
-        <div
-          className={cn(
-            'absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform duration-200',
-            checked ? 'translate-x-3.5' : 'translate-x-0.5'
-          )}
-        />
-      </div>
-      <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">
-        {label}
-      </span>
-    </button>
-  );
-}
-
 // ── Styled Select ─────────────────────────────────────────────────────────────
 
 function StyledSelect({
@@ -186,24 +156,30 @@ function StyledSelect({
 type Status = 'idle' | 'capturing';
 
 export function CodeSnippetSection() {
-  const { setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius: setCanvasBorderRadius } = useImageStore();
+  const { setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius: setCanvasBorderRadius, selectedAspectRatio } = useImageStore();
 
   const [code, setCode] = React.useState(DEFAULT_CODE);
   const [language, setLanguage] = React.useState('javascript');
   const [themeId, setThemeId] = React.useState('dracula');
   const [fontId, setFontId] = React.useState('jetbrainsMono');
-  const [fontSize, setFontSize] = React.useState(14);
-  const [borderRadius, setBorderRadius] = React.useState(12);
   const [showLineNumbers, setShowLineNumbers] = React.useState(true);
   const [showTitleBar, setShowTitleBar] = React.useState(true);
   const [status, setStatus] = React.useState<Status>('idle');
+  const [showSettings, setShowSettings] = React.useState(false);
 
-  const captureRef = React.useRef<HTMLDivElement>(null);
+  const hiddenCaptureRef = React.useRef<HTMLDivElement>(null);
+  const previewRef = React.useRef<HTMLDivElement>(null);
+  const previewWrapperRef = React.useRef<HTMLDivElement>(null);
+  const [previewScale, setPreviewScale] = React.useState(1);
+  const [cardHeight, setCardHeight] = React.useState(0);
 
   const currentTheme = CODE_THEMES.find((t) => t.id === themeId) ?? CODE_THEMES[0];
   const currentFont = FONTS.find((f) => f.id === fontId) ?? FONTS[0];
   const themeBg =
     (currentTheme.style.hljs?.background as string) || '#282a36';
+
+  const fontSize = 14;
+  const borderRadius = 12;
 
   // Load Google Fonts
   React.useEffect(() => {
@@ -215,15 +191,44 @@ export function CodeSnippetSection() {
     document.head.appendChild(link);
   }, []);
 
+  // Scale preview to fit panel width
+  React.useEffect(() => {
+    if (!previewWrapperRef.current) return;
+    const el = previewWrapperRef.current;
+    const update = () => setPreviewScale(el.clientWidth / PREVIEW_WIDTH);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Measure card height for proper container sizing
+  React.useEffect(() => {
+    if (!previewRef.current) return;
+    const el = previewRef.current;
+    const update = () => setCardHeight(el.scrollHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [code, themeId, language, showLineNumbers, showTitleBar, fontId]);
+
   const handleAddToCanvas = React.useCallback(async () => {
-    if (!captureRef.current || status === 'capturing') return;
+    if (!hiddenCaptureRef.current || status === 'capturing') return;
     setStatus('capturing');
 
     try {
-      const canvas = await domToCanvas(captureRef.current, {
-        scale: 3,
+      const preset = getAspectRatioPreset(selectedAspectRatio);
+      const targetWidth = preset?.width || 1920;
+
+      // Measure actual content width of the fit-content code window
+      const actualWidth = hiddenCaptureRef.current.offsetWidth;
+      // Scale so the captured image is high-res (at least targetWidth pixels)
+      const captureScale = Math.max(2, targetWidth / actualWidth);
+
+      const canvas = await domToCanvas(hiddenCaptureRef.current, {
+        scale: captureScale,
         backgroundColor: themeBg,
-        style: { transform: 'none', borderRadius: '0px' },
       });
 
       const blob = await new Promise<Blob | null>((resolve) =>
@@ -235,7 +240,7 @@ export function CodeSnippetSection() {
         setUploadedImageUrl(url, 'code-snippet.png');
         setImageOpacity(1);
         setImageScale(100);
-        setCanvasBorderRadius(24);
+        setCanvasBorderRadius(0); // Border radius is baked into the capture
         setStatus('idle');
       } else {
         setStatus('idle');
@@ -244,12 +249,23 @@ export function CodeSnippetSection() {
       console.error('Code capture failed:', e);
       setStatus('idle');
     }
-  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setCanvasBorderRadius, status, themeBg]);
+  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setCanvasBorderRadius, status, themeBg, selectedAspectRatio]);
 
   return (
+    <>
     <SectionWrapper title="Add Code" defaultOpen={false}>
-      <div className="space-y-3">
-        {/* Row 1: Theme + Language */}
+      <div className="space-y-2.5">
+        {/* Code textarea — primary input, shown first */}
+        <textarea
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          rows={4}
+          spellCheck={false}
+          placeholder="Paste your code here..."
+          className="w-full px-3 py-2.5 rounded-lg border border-border/50 bg-muted/50 text-[11px] text-foreground font-mono placeholder:text-muted-foreground/50 resize-y focus:outline-none focus:border-primary/40 leading-relaxed transition-colors"
+        />
+
+        {/* Compact controls row: Theme + Language */}
         <div className="grid grid-cols-2 gap-1.5">
           <StyledSelect
             value={themeId}
@@ -263,70 +279,76 @@ export function CodeSnippetSection() {
           />
         </div>
 
-        {/* Row 2: Font */}
-        <StyledSelect
-          value={fontId}
-          onChange={setFontId}
-          options={FONTS}
-        />
+        {/* Toggles row */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setShowLineNumbers(!showLineNumbers)}
+            className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[10px] font-medium border transition-colors',
+              showLineNumbers
+                ? 'bg-primary/10 border-primary/20 text-primary'
+                : 'bg-muted/40 border-border/40 text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3h1M2 6h1M2 9h1M5 3h5M5 6h5M5 9h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" /></svg>
+            Lines
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowTitleBar(!showTitleBar)}
+            className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[10px] font-medium border transition-colors',
+              showTitleBar
+                ? 'bg-primary/10 border-primary/20 text-primary'
+                : 'bg-muted/40 border-border/40 text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="9" cy="6" r="1" fill="currentColor"/></svg>
+            Window
+          </button>
 
-        {/* Row 3: Size + Round */}
-        <div className="grid grid-cols-2 gap-1.5">
-          <div className="relative">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] text-muted-foreground/60 font-medium">Size</span>
-            <input
-              type="number"
-              value={fontSize}
-              onChange={(e) =>
-                setFontSize(Math.max(10, Math.min(28, Number(e.target.value))))
-              }
-              min={10}
-              max={28}
-              className="w-full h-7 pl-9 pr-2 rounded-md border border-border/50 bg-muted/50 text-[11px] text-foreground tabular-nums outline-none focus:border-primary/40 transition-colors text-right"
-            />
-          </div>
-          <div className="relative">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] text-muted-foreground/60 font-medium">Round</span>
-            <input
-              type="number"
-              value={borderRadius}
-              onChange={(e) =>
-                setBorderRadius(Math.max(0, Math.min(32, Number(e.target.value))))
-              }
-              min={0}
-              max={32}
-              className="w-full h-7 pl-12 pr-2 rounded-md border border-border/50 bg-muted/50 text-[11px] text-foreground tabular-nums outline-none focus:border-primary/40 transition-colors text-right"
-            />
-          </div>
+          <div className="flex-1" />
+
+          {/* Font picker toggle */}
+          <button
+            type="button"
+            onClick={() => setShowSettings(!showSettings)}
+            className={cn(
+              'text-[10px] text-muted-foreground hover:text-foreground transition-colors',
+              showSettings && 'text-primary'
+            )}
+          >
+            {showSettings ? 'Less' : 'Font'}
+          </button>
         </div>
 
-        {/* Row 4: Toggles */}
-        <div className="flex items-center gap-4">
-          <Toggle checked={showLineNumbers} onChange={setShowLineNumbers} label="Lines" />
-          <Toggle checked={showTitleBar} onChange={setShowTitleBar} label="Window" />
-        </div>
+        {/* Font picker */}
+        {showSettings && (
+          <StyledSelect
+            value={fontId}
+            onChange={setFontId}
+            options={FONTS}
+          />
+        )}
 
-        {/* Code textarea */}
-        <textarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          rows={5}
-          spellCheck={false}
-          placeholder="Paste your code here..."
-          className="w-full px-3 py-2.5 rounded-lg border border-border/50 bg-muted/50 text-[11px] text-foreground font-mono placeholder:text-muted-foreground/50 resize-y focus:outline-none focus:border-primary/40 leading-relaxed transition-colors"
-        />
-
-        {/* Live inline preview */}
-        <div className="rounded-lg overflow-hidden border border-border/30">
+        {/* Scaled preview */}
+        <div
+          ref={previewWrapperRef}
+          className="overflow-hidden rounded-lg border border-border/30"
+          style={{ height: cardHeight > 0 ? `${cardHeight * previewScale}px` : undefined }}
+        >
           <div
-            ref={captureRef}
+            ref={previewRef}
             style={{
+              width: `${PREVIEW_WIDTH}px`,
+              transform: `scale(${previewScale})`,
+              transformOrigin: 'top left',
               borderRadius: `${borderRadius}px`,
               overflow: 'hidden',
               backgroundColor: themeBg,
             }}
           >
-            {/* Optional macOS title bar */}
             {showTitleBar && (
               <div
                 style={{
@@ -386,5 +408,69 @@ export function CodeSnippetSection() {
         </button>
       </div>
     </SectionWrapper>
+
+    {/* Hidden off-screen render for high-res capture — width: fit-content */}
+    <div
+      aria-hidden
+      style={{
+        position: 'fixed',
+        left: '-99999px',
+        top: 0,
+        pointerEvents: 'none',
+        zIndex: -1,
+      }}
+    >
+      <div
+        ref={hiddenCaptureRef}
+        style={{
+          width: 'fit-content',
+          maxWidth: `${MAX_RENDER_WIDTH}px`,
+          borderRadius: `${borderRadius}px`,
+          overflow: 'hidden',
+          backgroundColor: themeBg,
+        }}
+      >
+        {showTitleBar && (
+          <div
+            style={{
+              backgroundColor: themeBg,
+              padding: '16px 24px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#ff5f57' }} />
+            <div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#febc2e' }} />
+            <div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#28c840' }} />
+          </div>
+        )}
+
+        <SyntaxHighlighter
+          language={language}
+          style={currentTheme.style}
+          showLineNumbers={showLineNumbers}
+          wrapLines
+          wrapLongLines
+          customStyle={{
+            margin: 0,
+            padding: showTitleBar ? '16px 28px 28px' : '28px',
+            fontSize: `${fontSize}px`,
+            fontFamily: currentFont.css,
+            lineHeight: '1.6',
+            borderRadius: 0,
+          }}
+          lineNumberStyle={{
+            minWidth: '2em',
+            paddingRight: '0.8em',
+            opacity: 0.4,
+            fontFamily: currentFont.css,
+          }}
+        >
+          {code || ' '}
+        </SyntaxHighlighter>
+      </div>
+    </div>
+    </>
   );
 }

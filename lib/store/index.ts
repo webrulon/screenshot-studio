@@ -739,6 +739,9 @@ export const useImageStore = create<ImageState>()(
         uploadedImageUrl: url,
         imageName: name,
       });
+      // Immediately sync to editor store so canvas updates without
+      // waiting for the EditorStoreSync useEffect cycle
+      useEditorStore.getState().setScreenshot({ src: url });
     },
 
     setImage: (file: File) => {

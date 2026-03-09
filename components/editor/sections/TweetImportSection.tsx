@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useImageStore } from '@/lib/store';
+import { getAspectRatioPreset } from '@/lib/aspect-ratio-utils';
 import { SectionWrapper } from './SectionWrapper';
 import { cn } from '@/lib/utils';
 import { domToCanvas } from 'modern-screenshot';
@@ -123,6 +124,10 @@ function ReplyIcon({ color }: { color: string }) {
 
 // ── Tweet Card ───────────────────────────────────────────────────────────────
 
+// Standard Twitter/X feed column width is 598px.
+// Capture at this width, then scale up to fill the canvas.
+const TWEET_WIDTH = 598;
+
 function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark' }) {
   const isDark = theme === 'dark';
 
@@ -145,12 +150,14 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
     }
   }
 
+  // Sizes match standard Twitter/X card proportions at 550px.
+  // domToCanvas reflows the clone to CAPTURE_WIDTH; scale: 2 gives 1100px retina output.
   return (
     <div
       style={{
         backgroundColor: colors.bg,
         color: colors.text,
-        padding: '16px',
+        padding: '20px 24px',
         fontFamily:
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
         width: '100%',
@@ -158,13 +165,15 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
         <img
           src={avatarUrl}
           alt=""
+          width={40}
+          height={40}
           style={{
-            width: '44px',
-            height: '44px',
+            width: 40,
+            height: 40,
             borderRadius: '50%',
             flexShrink: 0,
             objectFit: 'cover',
@@ -172,11 +181,12 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
           crossOrigin="anonymous"
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span
               style={{
                 fontWeight: 700,
-                fontSize: '14px',
+                fontSize: 15,
+                lineHeight: 1.25,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -186,23 +196,24 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
             </span>
             {(tweet.user.is_blue_verified || tweet.user.verified) && <VerifiedBadge />}
           </div>
-          <div style={{ color: colors.secondary, fontSize: '13px' }}>
+          <div style={{ color: colors.secondary, fontSize: 14, lineHeight: 1.25 }}>
             @{tweet.user.screen_name}
           </div>
         </div>
-        <div style={{ flexShrink: 0, marginTop: '2px' }}>
+        <div style={{ flexShrink: 0 }}>
           <XLogo color={colors.text} />
         </div>
       </div>
 
-      {/* Text */}
+      {/* Tweet text */}
       <div
         style={{
-          fontSize: '15px',
-          lineHeight: '22px',
-          marginTop: '10px',
+          fontSize: 17,
+          lineHeight: 1.5,
+          marginTop: 12,
           whiteSpace: 'pre-wrap',
           wordWrap: 'break-word',
+          letterSpacing: '-0.01em',
         }}
       >
         {displayText}
@@ -212,11 +223,13 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
       {photos.length > 0 && (
         <div
           style={{
-            marginTop: '10px',
-            overflow: 'hidden',
+            marginTop: 12,
             display: 'grid',
             gridTemplateColumns: photos.length > 1 ? '1fr 1fr' : '1fr',
-            gap: '2px',
+            gap: 2,
+            borderRadius: 16,
+            overflow: 'hidden',
+            border: `1px solid ${colors.border}`,
           }}
         >
           {photos.slice(0, 4).map((url, i) => (
@@ -226,8 +239,8 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
               alt=""
               style={{
                 width: '100%',
-                height: photos.length === 1 ? 'auto' : '160px',
-                maxHeight: photos.length === 1 ? '260px' : undefined,
+                height: photos.length === 1 ? 'auto' : 200,
+                maxHeight: photos.length === 1 ? 300 : undefined,
                 objectFit: 'cover',
                 display: 'block',
               }}
@@ -240,25 +253,25 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
       {/* Footer */}
       <div
         style={{
-          marginTop: '10px',
-          paddingTop: '10px',
+          marginTop: 12,
+          paddingTop: 12,
           borderTop: `1px solid ${colors.border}`,
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
+          gap: 16,
           color: colors.secondary,
-          fontSize: '12px',
+          fontSize: 13,
         }}
       >
         <span>{date}</span>
         {(tweet.conversation_count ?? 0) > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <ReplyIcon color={colors.secondary} />
             {formatNumber(tweet.conversation_count!)}
           </span>
         )}
         {tweet.favorite_count > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <HeartIcon color={colors.secondary} />
             {formatNumber(tweet.favorite_count)}
           </span>
@@ -273,7 +286,7 @@ function TweetCard({ tweet, theme }: { tweet: TweetData; theme: 'light' | 'dark'
 type Status = 'idle' | 'loading' | 'loaded' | 'capturing';
 
 export function TweetImportSection() {
-  const { setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius } = useImageStore();
+  const { setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius, selectedAspectRatio } = useImageStore();
 
   const [urlInput, setUrlInput] = React.useState('');
   const [tweetData, setTweetData] = React.useState<TweetData | null>(null);
@@ -281,7 +294,33 @@ export function TweetImportSection() {
   const [status, setStatus] = React.useState<Status>('idle');
   const [error, setError] = React.useState<string | null>(null);
 
-  const captureRef = React.useRef<HTMLDivElement>(null);
+  // Separate ref for the off-screen full-width capture element
+  const hiddenCaptureRef = React.useRef<HTMLDivElement>(null);
+  // Preview: render at TWEET_WIDTH, scale down to sidebar width
+  const previewWrapRef = React.useRef<HTMLDivElement>(null);
+  const previewInnerRef = React.useRef<HTMLDivElement>(null);
+  const [previewScale, setPreviewScale] = React.useState(1);
+  const [previewHeight, setPreviewHeight] = React.useState<number | undefined>(undefined);
+
+  // Recalculate scale + height whenever the wrapper or inner content changes
+  React.useEffect(() => {
+    const wrap = previewWrapRef.current;
+    const inner = previewInnerRef.current;
+    if (!wrap || !inner) return;
+
+    const update = () => {
+      const wrapW = wrap.clientWidth;
+      const s = wrapW > 0 ? wrapW / TWEET_WIDTH : 1;
+      setPreviewScale(s);
+      setPreviewHeight(inner.scrollHeight * s);
+    };
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(wrap);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [tweetData, tweetTheme]);
 
   // ── Fetch tweet ──
   const fetchTweet = React.useCallback(
@@ -326,12 +365,15 @@ export function TweetImportSection() {
   );
 
   // ── Add to canvas ──
+  // Captures from the hidden off-screen element which is already at TWEET_WIDTH.
+  // Scales to fill canvas (same approach as CodeSnippetSection).
   const handleAddToCanvas = React.useCallback(async () => {
-    if (!captureRef.current) return;
+    if (!hiddenCaptureRef.current) return;
     setStatus('capturing');
 
     try {
-      const images = captureRef.current.querySelectorAll('img');
+      // Wait for images in the hidden capture element to load
+      const images = hiddenCaptureRef.current.querySelectorAll('img');
       await Promise.all(
         Array.from(images).map(
           (img) =>
@@ -343,11 +385,15 @@ export function TweetImportSection() {
         )
       );
 
+      // Scale to fill canvas width, minimum 2x for retina
+      const preset = getAspectRatioPreset(selectedAspectRatio);
+      const targetWidth = preset?.width || 1920;
+      const captureScale = Math.max(2, targetWidth / TWEET_WIDTH);
+
       const captureBg = tweetTheme === 'dark' ? '#000000' : '#ffffff';
-      const canvas = await domToCanvas(captureRef.current, {
-        scale: 3,
+      const canvas = await domToCanvas(hiddenCaptureRef.current, {
+        scale: captureScale,
         backgroundColor: captureBg,
-        style: { transform: 'none', borderRadius: '0px' },
       });
 
       const blob = await new Promise<Blob | null>((resolve) =>
@@ -359,7 +405,7 @@ export function TweetImportSection() {
         setUploadedImageUrl(url, 'tweet-screenshot.png');
         setImageOpacity(1);
         setImageScale(100);
-        setBorderRadius(24);
+        setBorderRadius(16);
         setTweetData(null);
         setUrlInput('');
         setStatus('idle');
@@ -369,12 +415,13 @@ export function TweetImportSection() {
       setError('Failed to capture tweet');
       setStatus('loaded');
     }
-  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius, tweetTheme]);
+  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius, tweetTheme, selectedAspectRatio]);
 
   return (
+    <>
     <SectionWrapper title="Add Tweet" defaultOpen={false}>
-      <div className="space-y-3">
-        {/* URL input — integrated field with icon and button */}
+      <div className="space-y-2.5">
+        {/* URL input */}
         <div className="relative">
           <LinkSquare02Icon size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
           <input
@@ -388,12 +435,15 @@ export function TweetImportSection() {
             onKeyDown={(e) => {
               if (e.key === 'Enter') fetchTweet(urlInput);
             }}
-            placeholder="Paste tweet URL or ID..."
-            className="w-full h-9 pl-8 pr-16 rounded-lg border border-border/50 bg-muted/50 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 transition-colors"
+            placeholder="Paste tweet URL or ID\u2026"
+            spellCheck={false}
+            autoComplete="off"
+            className="w-full h-9 pl-8 pr-16 rounded-lg border border-border/50 bg-muted/50 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:border-primary/40 transition-colors"
           />
           {urlInput && (
             <button
               onClick={() => { setUrlInput(''); setError(null); setTweetData(null); setStatus('idle'); }}
+              aria-label="Clear input"
               className="absolute right-[52px] top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
             >
               <Cancel01Icon size={12} />
@@ -402,7 +452,8 @@ export function TweetImportSection() {
           <button
             onClick={() => fetchTweet(urlInput)}
             disabled={status === 'loading' || !urlInput.trim()}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 h-6 px-2.5 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold hover:bg-primary/90 disabled:opacity-40 transition-colors"
+            aria-label="Fetch tweet"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 h-6 px-2.5 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors focus-visible:ring-1 focus-visible:ring-primary/40"
           >
             {status === 'loading' ? (
               <Loading03Icon size={12} className="animate-spin" />
@@ -419,14 +470,14 @@ export function TweetImportSection() {
           <div className="rounded-lg border border-border/30 bg-muted/30 p-3 animate-pulse">
             <div className="flex gap-2.5 items-center">
               <div className="w-8 h-8 rounded-full bg-border/40" />
-              <div className="flex-1 space-y-1">
-                <div className="h-2.5 w-20 rounded bg-border/40" />
-                <div className="h-2 w-14 rounded bg-border/40" />
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <div className="h-2.5 w-20 rounded-full bg-border/40" />
+                <div className="h-2 w-14 rounded-full bg-border/40" />
               </div>
             </div>
-            <div className="mt-2.5 space-y-1">
-              <div className="h-2 w-full rounded bg-border/40" />
-              <div className="h-2 w-2/3 rounded bg-border/40" />
+            <div className="mt-2.5 space-y-1.5">
+              <div className="h-2 w-full rounded-full bg-border/40" />
+              <div className="h-2 w-2/3 rounded-full bg-border/40" />
             </div>
           </div>
         )}
@@ -434,43 +485,65 @@ export function TweetImportSection() {
         {/* Tweet loaded */}
         {tweetData && status !== 'loading' && (
           <div className="space-y-2.5">
-            {/* Theme toggle */}
-            <div className="flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-md border border-border/20 w-fit">
-              {(['light', 'dark'] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTweetTheme(t)}
-                  className={cn(
-                    'px-3 py-1 rounded text-[10px] font-medium transition-all',
-                    tweetTheme === t
-                      ? 'bg-background dark:bg-accent text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  {t === 'light' ? 'Light' : 'Dark'}
-                </button>
-              ))}
+            {/* Theme toggle + dismiss */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
+                {(['light', 'dark'] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTweetTheme(t)}
+                    className={cn(
+                      'px-3 py-1 rounded-md text-[10px] font-medium transition-all',
+                      tweetTheme === t
+                        ? 'bg-background dark:bg-accent text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {t === 'light' ? 'Light' : 'Dark'}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => { setTweetData(null); setUrlInput(''); setStatus('idle'); }}
+                aria-label="Remove tweet"
+                className="p-1 rounded-md text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50 transition-colors"
+              >
+                <Cancel01Icon size={14} />
+              </button>
             </div>
 
-            {/* Capture area */}
+            {/* Sidebar preview — renders at TWEET_WIDTH, scaled down to fit */}
             <div
-              ref={captureRef}
-              className="overflow-hidden rounded-lg border border-border/30"
-              style={{ backgroundColor: tweetTheme === 'dark' ? '#000000' : '#ffffff' }}
+              ref={previewWrapRef}
+              className="rounded-lg border border-border/30"
+              style={{
+                overflow: 'hidden',
+                height: previewHeight,
+                backgroundColor: tweetTheme === 'dark' ? '#000000' : '#ffffff',
+              }}
             >
-              <TweetCard tweet={tweetData} theme={tweetTheme} />
+              <div
+                ref={previewInnerRef}
+                style={{
+                  width: TWEET_WIDTH,
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <TweetCard tweet={tweetData} theme={tweetTheme} />
+              </div>
             </div>
 
             {/* Action button */}
             <button
               onClick={handleAddToCanvas}
               disabled={status === 'capturing'}
-              className="w-full h-8 rounded-lg text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full h-8 rounded-lg text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 focus-visible:ring-1 focus-visible:ring-primary/40"
             >
               {status === 'capturing' ? (
                 <>
                   <Loading03Icon size={12} className="animate-spin" />
-                  Adding...
+                  Adding{'\u2026'}
                 </>
               ) : (
                 'Add to Canvas'
@@ -487,5 +560,30 @@ export function TweetImportSection() {
         )}
       </div>
     </SectionWrapper>
+
+    {/* Hidden off-screen capture element at full TWEET_WIDTH (598px) */}
+    {tweetData && (
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          left: '-99999px',
+          top: 0,
+          pointerEvents: 'none',
+          zIndex: -1,
+        }}
+      >
+        <div
+          ref={hiddenCaptureRef}
+          style={{
+            width: TWEET_WIDTH,
+            backgroundColor: tweetTheme === 'dark' ? '#000000' : '#ffffff',
+          }}
+        >
+          <TweetCard tweet={tweetData} theme={tweetTheme} />
+        </div>
+      </div>
+    )}
+    </>
   );
 }
