@@ -1,11 +1,16 @@
 /**
- * API route for server-side image processing with Sharp
- * Handles format conversion (PNG/JPEG) and quality optimization
+ * API route for server-side image compression with Sharp
+ * Accepts FormData with raw image blob, returns optimized image blob.
+ *
+ * Sharp produces significantly smaller files than browser canvas.toBlob():
+ * - JPEG: MozJPEG encoder (10-15% smaller than browser JPEG at same quality)
+ * - WebP: libwebp encoder (better than browser WebP)
+ * - PNG: zlib + adaptive filtering (optimal lossless compression)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { QUALITY_PRESETS, type ExportApiRequest, type ExportApiResponse, type ExportFormat, type QualityPreset } from '@/lib/export/types';
+import { QUALITY_PRESETS, type ExportFormat, type QualityPreset } from '@/lib/export/types';
 
 function isValidFormat(format: string): format is ExportFormat {
   return format === 'png' || format === 'jpeg' || format === 'webp';
@@ -17,13 +22,14 @@ function isValidQualityPreset(preset: string): preset is QualityPreset {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as ExportApiRequest;
-    const { imageData, format, qualityPreset } = body;
+    const formData = await request.formData();
+    const imageFile = formData.get('image') as File | null;
+    const format = formData.get('format') as string | null;
+    const qualityPreset = formData.get('qualityPreset') as string | null;
 
-    // Validate required fields
-    if (!imageData || typeof imageData !== 'string') {
+    if (!imageFile) {
       return NextResponse.json(
-        { error: 'Missing or invalid imageData' },
+        { error: 'Missing image file' },
         { status: 400 }
       );
     }
@@ -42,19 +48,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert base64 to buffer
-    const inputBuffer = Buffer.from(imageData, 'base64');
+    const inputBuffer = Buffer.from(await imageFile.arrayBuffer());
     const qualitySettings = QUALITY_PRESETS[qualityPreset];
 
-    let sharpInstance = sharp(inputBuffer);
+    const sharpInstance = sharp(inputBuffer);
     let outputBuffer: Buffer;
     let mimeType: string;
 
     if (format === 'jpeg') {
       outputBuffer = await sharpInstance
+        .flatten({ background: { r: 255, g: 255, b: 255 } }) // Flatten alpha to white (JPEG has no transparency)
         .jpeg({
           quality: qualitySettings.jpeg,
-          mozjpeg: true,
+          mozjpeg: true, // MozJPEG produces ~10-15% smaller files than standard JPEG
         })
         .toBuffer();
       mimeType = 'image/jpeg';
@@ -62,6 +68,7 @@ export async function POST(request: NextRequest) {
       outputBuffer = await sharpInstance
         .webp({
           quality: qualitySettings.webp,
+          effort: 4, // balanced speed vs compression (0=fastest, 6=slowest)
         })
         .toBuffer();
       mimeType = 'image/webp';
@@ -75,16 +82,12 @@ export async function POST(request: NextRequest) {
       mimeType = 'image/png';
     }
 
-    // Convert output buffer to base64
-    const outputBase64 = outputBuffer.toString('base64');
-
-    const response: ExportApiResponse = {
-      imageData: outputBase64,
-      mimeType,
-      fileSize: outputBuffer.length,
-    };
-
-    return NextResponse.json(response);
+    return new NextResponse(new Uint8Array(outputBuffer), {
+      headers: {
+        'Content-Type': mimeType,
+        'Content-Length': outputBuffer.length.toString(),
+      },
+    });
   } catch (error) {
     console.error('Export API error:', error);
     return NextResponse.json(

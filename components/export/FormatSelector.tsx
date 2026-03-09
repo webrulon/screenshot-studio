@@ -11,9 +11,9 @@ interface FormatSelectorProps {
 }
 
 const FORMATS: { value: ExportFormat; label: string; description: string }[] = [
+  { value: 'jpeg', label: 'JPG', description: 'Smaller files, great for sharing' },
   { value: 'png', label: 'PNG', description: 'Lossless, supports transparency' },
   { value: 'webp', label: 'WebP', description: 'Best compression, small & sharp' },
-  { value: 'jpeg', label: 'JPEG', description: 'Smaller files, no transparency' },
 ];
 
 export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) {

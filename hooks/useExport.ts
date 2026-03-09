@@ -25,9 +25,9 @@ export interface ExportSettings {
 }
 
 const DEFAULT_SETTINGS: ExportSettings = {
-  format: 'png',
+  format: 'jpeg',
   qualityPreset: 'high',
-  scale: 3,
+  scale: 2,
 };
 
 /**
@@ -292,6 +292,7 @@ export function useExport(selectedAspectRatio: string) {
         scale: 2,
         exportWidth: preset.width,
         exportHeight: preset.height,
+        skipSharp: true, // Clipboard doesn't need Sharp compression — speed matters more
       };
 
       // exportElement reports progress 0-95 via callback

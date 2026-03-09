@@ -79,14 +79,10 @@ export function EditorCanvas() {
       <div className="flex-1 flex flex-col h-full w-full">
         <div className="flex-1 flex items-center justify-center p-4 md:p-8">
           <div
-            key={selectedAspectRatio}
             className="relative rounded-lg overflow-hidden transition-all duration-300"
             style={{
               aspectRatio: `${ratioValue}`,
-              width: ratioValue >= 1 ? '100%' : 'auto',
-              height: ratioValue < 1 ? '100%' : 'auto',
-              maxWidth: '48rem',
-              maxHeight: '70vh',
+              width: `min(100%, min(48rem, calc(70vh * ${ratioValue})))`,
             }}
           >
             <CleanUploadState />

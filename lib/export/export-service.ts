@@ -27,6 +27,8 @@ export interface ExportOptions {
   scale: number;
   exportWidth: number;
   exportHeight: number;
+  /** Skip Sharp API (e.g. for clipboard copies where speed matters more than compression) */
+  skipSharp?: boolean;
 }
 
 export interface ExportResult {
@@ -636,7 +638,8 @@ export async function exportElement(
     const sharpResult = await processWithSharp(
       finalCanvas,
       options.format,
-      options.qualityPreset
+      options.qualityPreset,
+      { skipApi: options.skipSharp, onProgress: report }
     );
 
     report(90);

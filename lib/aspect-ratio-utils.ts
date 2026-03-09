@@ -32,6 +32,15 @@ const STANDARD_DIMENSIONS: Record<string, { width: number; height: number }> = {
 const SPECIAL_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'youtube_banner': { width: 2560, height: 1440 }, // YouTube Channel Banner - Higher resolution 16:9
   'instagram_banner': { width: 1080, height: 1080 }, // Instagram Highlight Cover - Square format
+  'youtube_thumbnail': { width: 1280, height: 720 }, // YouTube Thumbnail
+  'youtube_video': { width: 1920, height: 1080 }, // YouTube Video
+  'pinterest_long': { width: 1000, height: 2100 }, // Pinterest Long Pin
+  'appstore_iphone65': { width: 1284, height: 2778 }, // iPhone 6.5" screenshot
+  'appstore_iphone55': { width: 1242, height: 2208 }, // iPhone 5.5" screenshot
+  'appstore_ipad': { width: 2048, height: 2732 }, // iPad Pro 12.9" screenshot
+  'appstore_iphone65_landscape': { width: 2778, height: 1284 }, // iPhone 6.5" landscape
+  'appstore_iphone55_landscape': { width: 2208, height: 1242 }, // iPhone 5.5" landscape
+  'appstore_ipad_landscape': { width: 2732, height: 2048 }, // iPad Pro 12.9" landscape
 };
 
 /**
