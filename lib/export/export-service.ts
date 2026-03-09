@@ -18,6 +18,8 @@ import { getFontCSS } from '@/lib/constants/fonts';
 import { exportWorkerService } from '@/lib/workers/export-worker-service';
 import { processWithSharp } from './sharp-client';
 import type { ExportFormat, QualityPreset } from './types';
+import { useImageStore } from '@/lib/store';
+import type { BlurRegion } from '@/lib/store';
 
 export interface ExportOptions {
   format: ExportFormat;
@@ -94,6 +96,53 @@ function applyBlurToCanvasSync(
   ctx.filter = 'none';
 
   return blurredCanvas;
+}
+
+/**
+ * Apply blur regions to the exported canvas.
+ * CSS backdrop-filter doesn't render in domToCanvas, so we apply it manually.
+ */
+function applyBlurRegionsToCanvas(
+  canvas: HTMLCanvasElement,
+  containerWidth: number,
+  containerHeight: number
+): void {
+  const { blurRegions } = useImageStore.getState();
+  if (!blurRegions || blurRegions.length === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Scale factor from CSS pixels to canvas pixels
+  const scaleX = canvas.width / containerWidth;
+  const scaleY = canvas.height / containerHeight;
+
+  // Create a copy of the current canvas to use as blur source
+  const sourceCanvas = document.createElement('canvas');
+  sourceCanvas.width = canvas.width;
+  sourceCanvas.height = canvas.height;
+  const sourceCtx = sourceCanvas.getContext('2d');
+  if (!sourceCtx) return;
+  sourceCtx.drawImage(canvas, 0, 0);
+
+  for (const region of blurRegions) {
+    if (!region.isVisible) continue;
+
+    const rx = region.position.x * scaleX;
+    const ry = region.position.y * scaleY;
+    const rw = region.size.width * scaleX;
+    const rh = region.size.height * scaleY;
+    const blurPx = region.blurAmount * Math.max(scaleX, scaleY);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(rx, ry, rw, rh, 4 * Math.max(scaleX, scaleY));
+    ctx.clip();
+    ctx.filter = `blur(${blurPx}px)`;
+    ctx.drawImage(sourceCanvas, 0, 0);
+    ctx.filter = 'none';
+    ctx.restore();
+  }
 }
 
 /**
@@ -348,11 +397,14 @@ async function capture3DTransformWithModernScreenshot(
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   }
 
+  const elementRect = element.getBoundingClientRect();
+
   const canvas = await domToCanvas(element, {
     scale: scale,
     backgroundColor: null,
     filter: (node: Node) => {
       if (node instanceof HTMLElement && node.dataset.resizeHandle === 'true') return false;
+      if (node instanceof HTMLElement && node.dataset.blurRegion === 'true') return false;
       return true;
     },
     onCloneNode: (cloned: Node) => {
@@ -361,6 +413,9 @@ async function capture3DTransformWithModernScreenshot(
       }
     },
   });
+
+  // Apply blur regions as post-processing
+  applyBlurRegionsToCanvas(canvas, elementRect.width, elementRect.height);
 
   return canvas;
 }
@@ -412,6 +467,9 @@ async function exportHTMLCanvas(
     height: originalHeight,
     filter: (node: Node) => {
       if (node instanceof HTMLElement && node.dataset.resizeHandle === 'true') return false;
+      // Exclude blur region elements — backdrop-filter doesn't render in domToCanvas,
+      // so we apply blur as canvas post-processing below
+      if (node instanceof HTMLElement && node.dataset.blurRegion === 'true') return false;
       return true;
     },
     onCloneNode: (cloned: Node) => {
@@ -420,6 +478,9 @@ async function exportHTMLCanvas(
       }
     },
   });
+
+  // Apply blur regions as post-processing (CSS backdrop-filter doesn't export)
+  applyBlurRegionsToCanvas(canvas, originalWidth, originalHeight);
 
   // Scale the canvas to match export dimensions
   const finalWidth = targetWidth * scale;

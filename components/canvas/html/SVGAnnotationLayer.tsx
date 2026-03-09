@@ -128,6 +128,51 @@ function DraggableHandle({ cx: x, cy: y, primary, onDrag }: {
   );
 }
 
+// ── Delete button on selected annotation ────────────────────────────────────
+
+function AnnotationDeleteButton({ x, y, onDelete }: {
+  x: number; y: number; onDelete: () => void;
+}) {
+  return (
+    <g
+      style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        onDelete();
+      }}
+    >
+      <circle
+        cx={x} cy={y} r={12}
+        fill="hsl(0, 84%, 60%)"
+        stroke="white"
+        strokeWidth={2}
+        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }}
+      />
+      <path
+        d={`M ${x - 4} ${y - 4} L ${x + 4} ${y + 4} M ${x + 4} ${y - 4} L ${x - 4} ${y + 4}`}
+        stroke="white"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+
+function getDeleteButtonPos(a: AnnotationShape, canvasW: number, canvasH: number) {
+  let maxX = Math.max(a.x1, a.x2);
+  let minY = Math.min(a.y1, a.y2);
+
+  if (a.type === 'curved-arrow' && a.cx !== undefined && a.cy !== undefined) {
+    maxX = Math.max(maxX, a.cx);
+    minY = Math.min(minY, a.cy);
+  }
+
+  // Position top-right of bounding box, clamped within canvas
+  const btnX = Math.min(Math.max(maxX + 20, 24), canvasW - 24);
+  const btnY = Math.min(Math.max(minY - 20, 24), canvasH - 24);
+  return { x: btnX, y: btnY };
+}
+
 // ── Annotation element ───────────────────────────────────────────────────────
 
 const DRAG_THRESHOLD = 3; // px before drag actually starts
@@ -727,6 +772,23 @@ export function SVGAnnotationLayer({
         />
       ))}
       {renderDrawingPreview()}
+
+      {/* Delete button on selected annotation */}
+      {selectedId && !isToolActive && (() => {
+        const selected = annotations.find(a => a.id === selectedId);
+        if (!selected) return null;
+        const pos = getDeleteButtonPos(selected, canvasW, canvasH);
+        return (
+          <AnnotationDeleteButton
+            x={pos.x}
+            y={pos.y}
+            onDelete={() => {
+              removeAnnotation(selectedId);
+              setSelectedId(null);
+            }}
+          />
+        );
+      })()}
     </svg>
   );
 }

@@ -103,7 +103,6 @@ export function AnnotateSection() {
     updateBlurRegion,
     removeBlurRegion,
     clearBlurRegions,
-    removeAnnotation,
   } = useImageStore();
 
   const selectedAnnotation = selectedAnnotationId
@@ -130,13 +129,6 @@ export function AnnotateSection() {
       updateAnnotation(selectedAnnotation.id, { strokeWidth: width });
     }
     setAnnotationDefaults({ strokeWidth: width });
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedAnnotationId) {
-      removeAnnotation(selectedAnnotationId);
-      setSelectedAnnotationId(null);
-    }
   };
 
   const totalItems = annotations.length + blurRegions.length;
@@ -183,19 +175,13 @@ export function AnnotateSection() {
           </div>
         )}
 
-        {/* ── Selected annotation controls ── */}
+        {/* ── Editing hint (when annotation selected, no tool active) ── */}
         {selectedAnnotation && !activeAnnotationTool && (
-          <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-accent/60 border border-border/40">
-            <span className="text-xs text-muted-foreground">
-              Selected: <span className="text-foreground font-medium capitalize">{selectedAnnotation.type}</span>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/6 border border-primary/12">
+            <div className="w-2.5 h-2.5 rounded-full bg-primary/60 shrink-0" />
+            <span className="text-xs text-primary/80">
+              Editing <span className="font-medium capitalize">{selectedAnnotation.type}</span> — click canvas to deselect
             </span>
-            <button
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors px-2 py-1 rounded-md hover:bg-destructive/10"
-            >
-              <Delete02Icon size={14} />
-              Delete
-            </button>
           </div>
         )}
 
@@ -253,58 +239,43 @@ export function AnnotateSection() {
 
         {/* ── Blur regions list ── */}
         {blurRegions.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">
-                Blur Regions
-              </span>
-              {blurRegions.length > 1 && (
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Blur Regions</span>
+            {blurRegions.map((region, index) => (
+              <div
+                key={region.id}
+                className="flex items-center gap-2 py-1.5 px-2.5 rounded-lg bg-muted/30 border border-border/30"
+              >
+                <span className="text-[11px] text-muted-foreground shrink-0 w-8">#{index + 1}</span>
+                <Slider
+                  value={[region.blurAmount]}
+                  onValueChange={(v) =>
+                    updateBlurRegion(region.id, { blurAmount: v[0] })
+                  }
+                  min={2}
+                  max={30}
+                  step={1}
+                  valueDisplay={`${region.blurAmount}px`}
+                />
                 <button
-                  onClick={clearBlurRegions}
-                  className="text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+                  onClick={() => removeBlurRegion(region.id)}
+                  className="p-1 text-muted-foreground hover:text-destructive transition-colors shrink-0 rounded hover:bg-destructive/10"
+                  title="Remove"
                 >
-                  Clear all
+                  <Delete02Icon size={12} />
                 </button>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              {blurRegions.map((region, index) => (
-                <div
-                  key={region.id}
-                  className="flex items-center gap-2.5 py-2 px-3 rounded-lg bg-muted/30 border border-border/30 group hover:border-border/50 transition-colors"
-                >
-                  <span className="text-xs font-medium text-muted-foreground tabular-nums w-4 shrink-0">
-                    {index + 1}
-                  </span>
-                  <Slider
-                    value={[region.blurAmount]}
-                    onValueChange={(v) =>
-                      updateBlurRegion(region.id, { blurAmount: v[0] })
-                    }
-                    min={2}
-                    max={30}
-                    step={1}
-                    valueDisplay={`${region.blurAmount}px`}
-                  />
-                  <button
-                    onClick={() => removeBlurRegion(region.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all shrink-0 rounded hover:bg-destructive/10"
-                  >
-                    <Delete02Icon size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         )}
 
         {/* ── Footer: count + clear ── */}
         {totalItems > 0 && (
           <div className="flex items-center justify-between pt-2 border-t border-border/30">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground tabular-nums">
               {annotations.length > 0 && `${annotations.length} shape${annotations.length !== 1 ? 's' : ''}`}
-              {annotations.length > 0 && blurRegions.length > 0 && ' · '}
-              {blurRegions.length > 0 && `${blurRegions.length} blur`}
+              {annotations.length > 0 && blurRegions.length > 0 && ', '}
+              {blurRegions.length > 0 && `${blurRegions.length} blur region${blurRegions.length !== 1 ? 's' : ''}`}
             </span>
             <button
               onClick={() => { clearAnnotations(); clearBlurRegions(); }}
