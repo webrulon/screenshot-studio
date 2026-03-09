@@ -15,47 +15,43 @@ const stylePresets: { value: ImageStylePreset; label: string }[] = [
   { value: 'border-dark', label: 'Border Dark' },
 ];
 
-function StylePreview({ preset }: { preset: ImageStylePreset }) {
-  const outerBg = preset === 'glass-dark' || preset === 'border-dark'
-    ? 'rgb(176, 176, 180)'
-    : 'rgb(200, 200, 204)';
+function StylePreview({ preset, selected }: { preset: ImageStylePreset; selected: boolean }) {
+  const isDark = preset === 'glass-dark' || preset === 'border-dark';
+  const outerBg = isDark ? 'rgb(160, 160, 165)' : 'rgb(210, 210, 214)';
 
-  const getInnerStyle = (): React.CSSProperties => {
+  const getWrapperStyle = (): React.CSSProperties => {
     switch (preset) {
       case 'default':
-        return {
-          background: 'rgb(255, 255, 255)',
-          borderRadius: '8px',
-        };
+        return {};
       case 'glass-light':
         return {
-          background: 'rgba(255, 255, 255, 0.25)',
+          background: 'rgba(255, 255, 255, 0.3)',
           padding: '3px',
-          borderRadius: '11px',
+          borderRadius: '7px',
         };
       case 'glass-dark':
         return {
-          background: 'rgba(0, 0, 0, 0.3)',
+          background: 'rgba(0, 0, 0, 0.35)',
           padding: '3px',
-          borderRadius: '11px',
+          borderRadius: '7px',
         };
       case 'outline':
         return {
-          background: 'rgba(255, 255, 255, 0.35)',
+          background: 'rgba(255, 255, 255, 0.4)',
           padding: '2px',
-          borderRadius: '10px',
+          borderRadius: '7px',
         };
       case 'border-light':
         return {
           background: 'rgb(255, 255, 255)',
-          padding: '5px',
-          borderRadius: '12px',
+          padding: '4px',
+          borderRadius: '8px',
         };
       case 'border-dark':
         return {
-          background: 'rgb(26, 26, 26)',
-          padding: '5px',
-          borderRadius: '12px',
+          background: 'rgb(30, 30, 30)',
+          padding: '4px',
+          borderRadius: '8px',
         };
     }
   };
@@ -64,34 +60,23 @@ function StylePreview({ preset }: { preset: ImageStylePreset }) {
 
   return (
     <div
-      style={{
-        width: '100%',
-        aspectRatio: '1',
-        backgroundColor: outerBg,
-        borderRadius: '14px',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
+      className={cn(
+        'relative w-full aspect-square rounded-lg overflow-hidden transition-all',
+        selected ? 'ring-[1.5px] ring-primary ring-offset-1 ring-offset-card' : 'ring-1 ring-border/50',
+      )}
+      style={{ backgroundColor: outerBg }}
     >
       <div
-        style={{
-          position: 'absolute',
-          top: '19.5%',
-          left: '19.5%',
-          width: '95.5%',
-          height: '95.5%',
-          ...(hasWrapper ? getInnerStyle() : {}),
-        }}
+        className="absolute"
+        style={{ top: '19.5%', left: '19.5%', width: '95.5%', height: '95.5%' }}
       >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgb(255, 255, 255)',
-            borderRadius: '8px',
-            ...(preset === 'default' ? { borderRadius: '8px' } : {}),
-          }}
-        />
+        {hasWrapper ? (
+          <div className="w-full h-full" style={getWrapperStyle()}>
+            <div className="w-full h-full bg-white rounded-[5px]" />
+          </div>
+        ) : (
+          <div className="w-full h-full bg-white rounded-[8px]" />
+        )}
       </div>
     </div>
   );
@@ -107,13 +92,7 @@ export function StyleSection() {
   return (
     <SectionWrapper title="Style" defaultOpen={true}>
       <div className="space-y-3">
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '6px',
-          }}
-        >
+        <div className="grid grid-cols-3 gap-2">
           {stylePresets.map(({ value, label }) => {
             const isSelected = imageStylePreset === value;
             return (
@@ -121,31 +100,14 @@ export function StyleSection() {
                 key={value}
                 type="button"
                 onClick={() => setImageStylePreset(value)}
-                className={cn(
-                  'flex flex-col items-center cursor-pointer transition-all',
-                )}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px',
-                  borderRadius: '16px',
-                  textAlign: 'center',
-                  border: 'none',
-                  background: isSelected ? 'var(--muted)' : 'transparent',
-                  boxShadow: isSelected
-                    ? '0 0 0 2px var(--primary)'
-                    : '0 0 0 1px var(--border)',
-                }}
+                className="flex flex-col items-center gap-1.5 group"
               >
-                <StylePreview preset={value} />
+                <StylePreview preset={value} selected={isSelected} />
                 <span
-                  style={{
-                    fontSize: '10px',
-                    lineHeight: '10px',
-                    color: isSelected ? 'var(--foreground)' : 'var(--muted-foreground)',
-                  }}
+                  className={cn(
+                    'text-[10px] leading-tight transition-colors',
+                    isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
+                  )}
                 >
                   {label}
                 </span>

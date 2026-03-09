@@ -10,11 +10,8 @@ export function EditorPreview() {
       transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative w-full max-w-5xl mx-auto"
     >
-      {/* Glow effect behind the editor */}
-      <div className="absolute inset-0 -m-8 bg-primary/5 rounded-3xl blur-3xl" />
-
       {/* Editor shell */}
-      <div className="relative rounded-xl border border-border/60 bg-card overflow-hidden shadow-2xl shadow-black/10">
+      <div className="relative rounded-xl border border-border/60 bg-card overflow-hidden">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/40 bg-card">
           <div className="flex items-center gap-3">

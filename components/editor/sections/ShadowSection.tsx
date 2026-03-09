@@ -12,27 +12,22 @@ const shadowPresets: { value: ShadowPreset; label: string; shadow: string }[] = 
   { value: 'strong', label: 'Strong', shadow: 'rgba(0,0,0,0.45) 0px 24px 80px 0px, rgba(0,0,0,0.3) 0px 8px 24px 0px' },
 ];
 
-function ShadowPreview({ shadow }: { shadow: string }) {
+function ShadowPreview({ shadow, selected }: { shadow: string; selected: boolean }) {
   return (
     <div
-      style={{
-        width: '100%',
-        aspectRatio: '1',
-        backgroundColor: 'rgb(200, 200, 204)',
-        borderRadius: '14px',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
+      className={cn(
+        'relative w-full aspect-square rounded-lg overflow-hidden transition-all',
+        selected ? 'ring-[1.5px] ring-primary ring-offset-1 ring-offset-card' : 'ring-1 ring-border/50',
+      )}
+      style={{ backgroundColor: 'rgb(210, 210, 214)' }}
     >
       <div
+        className="absolute bg-white rounded-[10px]"
         style={{
-          position: 'absolute',
           top: '26%',
           left: '26%',
           width: '95%',
           height: '95%',
-          backgroundColor: 'rgb(255, 255, 255)',
-          borderRadius: '10px',
           boxShadow: shadow,
         }}
       />
@@ -45,13 +40,7 @@ export function ShadowSection() {
 
   return (
     <SectionWrapper title="Shadow" defaultOpen={true}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '6px',
-        }}
-      >
+      <div className="grid grid-cols-2 gap-2">
         {shadowPresets.map(({ value, label, shadow }) => {
           const isSelected = shadowPreset === value;
           return (
@@ -59,31 +48,14 @@ export function ShadowSection() {
               key={value}
               type="button"
               onClick={() => setShadowPreset(value)}
-              className={cn(
-                'flex flex-col items-center cursor-pointer transition-all',
-              )}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px',
-                borderRadius: '16px',
-                textAlign: 'center',
-                border: 'none',
-                background: isSelected ? 'var(--muted)' : 'transparent',
-                boxShadow: isSelected
-                  ? '0 0 0 2px var(--primary)'
-                  : '0 0 0 1px var(--border)',
-              }}
+              className="flex flex-col items-center gap-1.5 group"
             >
-              <ShadowPreview shadow={shadow} />
+              <ShadowPreview shadow={shadow} selected={isSelected} />
               <span
-                style={{
-                  fontSize: '10px',
-                  lineHeight: '10px',
-                  color: isSelected ? 'var(--foreground)' : 'var(--muted-foreground)',
-                }}
+                className={cn(
+                  'text-[10px] leading-tight transition-colors',
+                  isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
+                )}
               >
                 {label}
               </span>

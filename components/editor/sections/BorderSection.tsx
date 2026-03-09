@@ -12,29 +12,26 @@ const borderPresets = [
   { value: 20, label: 'Round' },
 ] as const;
 
-function BorderPreview({ radius }: { radius: number }) {
+function BorderPreview({ radius, selected }: { radius: number; selected: boolean }) {
+  const previewRadius = radius === 0 ? '0px' : radius === 12 ? '6px' : '12px';
+
   return (
     <div
-      style={{
-        width: '100%',
-        aspectRatio: '1',
-        backgroundColor: 'rgb(200, 200, 204)',
-        borderRadius: '14px',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
+      className={cn(
+        'relative w-full aspect-square rounded-lg overflow-hidden transition-all',
+        selected ? 'ring-[1.5px] ring-primary ring-offset-1 ring-offset-card' : 'ring-1 ring-border/50',
+      )}
+      style={{ backgroundColor: 'rgb(210, 210, 214)' }}
     >
       <div
-        style={{
-          position: 'absolute',
-          top: '19.5%',
-          left: '19.5%',
-          width: '95.5%',
-          height: '95.5%',
-          backgroundColor: 'rgb(255, 255, 255)',
-          borderRadius: radius === 0 ? '0px' : radius === 12 ? '12px' : '20px',
-        }}
-      />
+        className="absolute"
+        style={{ top: '19.5%', left: '19.5%', width: '95.5%', height: '95.5%' }}
+      >
+        <div
+          className="w-full h-full bg-white"
+          style={{ borderRadius: previewRadius }}
+        />
+      </div>
     </div>
   );
 }
@@ -45,14 +42,7 @@ export function BorderSection() {
   return (
     <SectionWrapper title="Border" defaultOpen={true}>
       <div className="space-y-3">
-        {/* Preset buttons */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '6px',
-          }}
-        >
+        <div className="grid grid-cols-3 gap-2">
           {borderPresets.map(({ value, label }) => {
             const isSelected = borderRadius === value;
             return (
@@ -60,31 +50,14 @@ export function BorderSection() {
                 key={value}
                 type="button"
                 onClick={() => setBorderRadius(value)}
-                className={cn(
-                  'flex flex-col items-center cursor-pointer transition-all',
-                )}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px',
-                  borderRadius: '16px',
-                  textAlign: 'center',
-                  border: 'none',
-                  background: isSelected ? 'var(--muted)' : 'transparent',
-                  boxShadow: isSelected
-                    ? '0 0 0 2px var(--primary)'
-                    : '0 0 0 1px var(--border)',
-                }}
+                className="flex flex-col items-center gap-1.5 group"
               >
-                <BorderPreview radius={value} />
+                <BorderPreview radius={value} selected={isSelected} />
                 <span
-                  style={{
-                    fontSize: '10px',
-                    lineHeight: '10px',
-                    color: isSelected ? 'var(--foreground)' : 'var(--muted-foreground)',
-                  }}
+                  className={cn(
+                    'text-[10px] leading-tight transition-colors',
+                    isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
+                  )}
                 >
                   {label}
                 </span>
@@ -93,7 +66,6 @@ export function BorderSection() {
           })}
         </div>
 
-        {/* Fine-tune slider */}
         <Slider
           value={[borderRadius]}
           onValueChange={(value) => setBorderRadius(value[0])}
