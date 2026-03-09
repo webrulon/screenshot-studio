@@ -2,34 +2,28 @@ import { Metadata } from "next";
 import { LandingPage } from "@/components/landing/LandingPage";
 
 export const metadata: Metadata = {
-  title: "Screenshot Studio - Free Screenshot Editor Online",
+  title: "Screenshot Studio - Free Screenshot Beautifier & Mockup Tool",
   description:
-    "Free screenshot editor and mockup tool — beautify screenshots with 100+ gradient backgrounds, Safari and Chrome browser mockups, 3D effects, animations, and video export. Import tweets and generate code snippets as images. A better free alternative to Pika Style and Shots.so. No signup, no watermarks.",
+    "Transform plain screenshots into professional graphics with Screenshot Studio. 100+ gradient backgrounds, Safari and Chrome browser mockups, 3D effects, animations, and video export. Import tweets and code snippets. Better free alternative to Pika Style and Shots.so. No signup, no watermarks.",
   keywords: [
-    "screenshot editor online free",
-    "free screenshot editor",
-    "online screenshot editor",
     "screenshot beautifier",
-    "free image editor online",
-    "beautify screenshots",
+    "screenshot mockup maker",
+    "beautify screenshots online",
     "screenshot background editor",
-    "screenshot to social media",
+    "image presentation tool",
     "pika style alternative",
     "shots.so alternative",
-    "screenshot mockup maker",
     "browser window mockup",
     "safari browser mockup generator",
     "chrome browser frame generator",
-    "browser mockup generator free",
     "screenshot wrapper online",
-    "image presentation tool free",
     "tweet to screenshot",
     "code snippet to image",
   ],
   openGraph: {
-    title: "Screenshot Studio - Free Screenshot Editor Online",
+    title: "Screenshot Studio - Free Screenshot Beautifier & Mockup Tool",
     description:
-      "Free screenshot editor online — beautify screenshots with 100+ backgrounds, 3D effects, animations, and video export. No signup required.",
+      "Transform screenshots into professional graphics. 100+ backgrounds, browser mockups, 3D effects, animations, and video export. No signup required.",
     url: "/landing",
   },
   alternates: {

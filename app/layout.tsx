@@ -232,7 +232,7 @@ const fontVariables = [
 
 export const metadata: Metadata = {
   title: {
-    default: "Screenshot Studio - Free Screenshot Editor Online",
+    default: "Screenshot Studio - Screenshot Beautifier & Mockup Maker",
     template: "%s | Screenshot Studio",
   },
   // Add your Google Search Console verification code here
@@ -328,9 +328,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
+    icon: [
+      { url: "/icon", type: "image/png", sizes: "32x32" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon",
+    apple: "/apple-icon",
   },
   manifest: "/manifest.json",
   category: "Design Tools",

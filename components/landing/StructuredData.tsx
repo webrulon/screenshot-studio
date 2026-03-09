@@ -42,12 +42,12 @@ export function StructuredData() {
         url: "https://screenshot-studio.com",
         logo: {
           "@type": "ImageObject",
-          url: "https://screenshot-studio.com/logo.svg",
-          width: 512,
-          height: 512,
+          url: "https://screenshot-studio.com/icon",
+          width: 32,
+          height: 32,
         },
         sameAs: [
-          "https://github.com/KartikLabhshetwar/stage",
+          "https://github.com/KartikLabhshetwar/screenshot-studio",
           "https://x.com/code_kartik",
         ],
       },
@@ -55,9 +55,9 @@ export function StructuredData() {
         "@type": "WebSite",
         "@id": "https://screenshot-studio.com/#website",
         url: "https://screenshot-studio.com",
-        name: "Screenshot Studio - Free Screenshot Editor Online",
+        name: "Screenshot Studio",
         description:
-          "Free screenshot editor online — turn screenshots into stunning social media graphics in seconds. No signup required.",
+          "Screenshot Studio is a free, browser-based screenshot editor that transforms plain screenshots into professional graphics with 100+ backgrounds, browser mockups, 3D effects, animations, and video export. No signup required.",
         publisher: {
           "@id": "https://screenshot-studio.com/#organization",
         },
@@ -66,6 +66,14 @@ export function StructuredData() {
         "@type": "FAQPage",
         "@id": "https://screenshot-studio.com/#faq",
         mainEntity: [
+          {
+            "@type": "Question",
+            name: "What is Screenshot Studio?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Screenshot Studio is a free, browser-based screenshot editor that transforms plain screenshots into professional-quality graphics. It offers 100+ gradient backgrounds, Safari and Chrome browser mockups, 3D perspective effects, animation timelines with 20+ presets, and video export in MP4, WebM, and GIF formats. Built as an open-source alternative to paid tools like Pika Style and Shots.so, it requires no signup, no downloads, and adds no watermarks.",
+            },
+          },
           {
             "@type": "Question",
             name: "Is Screenshot Studio free to use?",

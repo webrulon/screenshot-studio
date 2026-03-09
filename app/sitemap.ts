@@ -3,7 +3,7 @@ import { getAllComparisonSlugs } from '@/lib/seo/comparisons'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.BETTER_AUTH_URL || 'https://screenshot-studio.com'
-  const now = new Date('2026-03-09')
+  const now = new Date()
 
   const comparisonSlugs = getAllComparisonSlugs()
 
